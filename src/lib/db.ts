@@ -41,6 +41,14 @@ if (DATABASE_URL && !DATABASE_URL.includes('YOUR_NEON_PASSWORD') && !DATABASE_UR
   console.log('[Safie-DB] DATABASE_URL not yet active or contains placeholder. Running in resilient hybrid mode.');
 }
 
+export async function query(text: string, params?: any[]) {
+  if (pool) {
+    return pool.query(text, params);
+  }
+  // Local in-memory mock fallback if pool is absent
+  return { rows: [] as any[], rowCount: 0 };
+}
+
 async function ensureTables() {
   if (!pool || global._neonTablesInit) return;
   try {

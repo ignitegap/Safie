@@ -18,6 +18,10 @@ import {
   ChevronUp,
   Clock,
   Compass,
+  MessageSquare,
+  AlertCircle,
+  X,
+  Star,
 } from 'lucide-react';
 import {
   DELHI_NCR_SAFE_HAVENS,
@@ -84,6 +88,22 @@ export default function InteractiveSafetyMap() {
   const [loadingRoute, setLoadingRoute] = useState(false);
   const [showSteps, setShowSteps] = useState(false);
 
+  // Community Hazard & Feedback State
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  
+  const [reportCategory, setReportCategory] = useState('broken_streetlight');
+  const [reportAddress, setReportAddress] = useState('DLF Phase 2 Service Road');
+  const [reportDesc, setReportDesc] = useState('');
+  const [reportStatus, setReportStatus] = useState('');
+
+  const [feedbackSafety, setFeedbackSafety] = useState(4);
+  const [feedbackLighting, setFeedbackLighting] = useState(5);
+  const [feedbackComment, setFeedbackComment] = useState('');
+  const [feedbackStatus, setFeedbackStatus] = useState('');
+
+  const [recentReports, setRecentReports] = useState<any[]>([]);
+
   // Fetch routes from API
   const fetchRoute = async (origin: string, dest: string, city: string) => {
     setLoadingRoute(true);
@@ -107,9 +127,23 @@ export default function InteractiveSafetyMap() {
     }
   };
 
+  // Fetch community reports
+  const fetchReports = async () => {
+    try {
+      const res = await fetch('/api/reports');
+      const data = await res.json();
+      if (data.reports) {
+        setRecentReports(data.reports);
+      }
+    } catch (e) {
+      console.error('Failed to load reports', e);
+    }
+  };
+
   // Initial load
   useEffect(() => {
     fetchRoute(originInput, destInput, selectedCity);
+    fetchReports();
   }, []);
 
   const handleCitySwitch = (city: 'gurugram' | 'delhi' | 'worldwide') => {
@@ -137,6 +171,69 @@ export default function InteractiveSafetyMap() {
     fetchRoute(originInput, `${haven.lat},${haven.lng}`, selectedCity);
   };
 
+  // Handle Hazard Report Submission
+  const handleSubmitReport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setReportStatus('Submitting to Neon DB...');
+    try {
+      const res = await fetch('/api/reports', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          category: reportCategory,
+          lat: 28.4900,
+          lng: 77.0880,
+          address: reportAddress,
+          description: reportDesc,
+        }),
+      });
+      if (res.ok) {
+        setReportStatus('Report recorded on Neon PostgreSQL.');
+        setReportDesc('');
+        fetchReports();
+        setTimeout(() => {
+          setIsReportOpen(false);
+          setReportStatus('');
+        }, 1200);
+      } else {
+        setReportStatus('Failed to submit report');
+      }
+    } catch (err: any) {
+      setReportStatus('Error: ' + err.message);
+    }
+  };
+
+  // Handle Feedback Submission
+  const handleSubmitFeedback = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFeedbackStatus('Submitting rating...');
+    try {
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: originInput,
+          destination: destInput,
+          perceivedSafetyRating: feedbackSafety,
+          actualLightingRating: feedbackLighting,
+          comments: feedbackComment,
+        }),
+      });
+      if (res.ok) {
+        setFeedbackStatus('Rating saved on Neon PostgreSQL.');
+        setFeedbackComment('');
+        setTimeout(() => {
+          setIsFeedbackOpen(false);
+          setFeedbackStatus('');
+        }, 1200);
+      } else {
+        setFeedbackStatus('Failed to record rating');
+      }
+    } catch (err: any) {
+      setFeedbackStatus('Error: ' + err.message);
+    }
+  };
+
   const currentRoute =
     routesData.find((r) => r.type === activeRouteType) || routesData[0] || null;
 
@@ -153,14 +250,14 @@ export default function InteractiveSafetyMap() {
           Delhi & Gurugram Live Safety Routing Engine
         </h2>
         <p className="text-sm text-stone-600">
-          Compare safest illuminated corridors vs standard shortest paths. Works across Delhi NCR and worldwide.
+          Compare safest illuminated corridors vs standard shortest paths with real-time community reports.
         </p>
       </div>
 
       {/* Control & Waypoint Input Bar */}
       <div className="mb-4 p-4 rounded-2xl bg-white border border-rose-200/80 space-y-3">
         
-        {/* Row 1: Territory Tabs & Layer Toggles */}
+        {/* Row 1: Territory Tabs & Community Actions */}
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
           
           <div className="flex items-center gap-1.5">
@@ -199,15 +296,19 @@ export default function InteractiveSafetyMap() {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowSafeHavens(!showSafeHavens)}
-              className={`h-8 px-3 rounded-lg font-medium flex items-center gap-1.5 border transition-colors cursor-pointer ${
-                showSafeHavens
-                  ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
-                  : 'bg-white border-stone-200 text-stone-500'
-              }`}
+              onClick={() => setIsReportOpen(true)}
+              className="h-8 px-2.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <Shield className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Safe Havens</span>
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+              <span>Report Hazard</span>
+            </button>
+
+            <button
+              onClick={() => setIsFeedbackOpen(true)}
+              className="h-8 px-2.5 rounded-lg border border-rose-200 bg-rose-50/60 hover:bg-rose-100 text-stone-700 font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-rose-600" />
+              <span>Rate Route</span>
             </button>
 
             <button
@@ -485,9 +586,211 @@ export default function InteractiveSafetyMap() {
             )}
           </div>
 
+          {/* Recent Community Hazard Feed */}
+          {recentReports.length > 0 && (
+            <div className="p-4 rounded-xl bg-white border border-rose-200/80 space-y-2 text-xs">
+              <span className="text-[10px] font-mono text-stone-500 uppercase block font-medium">
+                Live Community Hazard Feed
+              </span>
+              <div className="space-y-1.5 max-h-28 overflow-y-auto pr-1">
+                {recentReports.slice(0, 3).map((rep) => (
+                  <div key={rep.id} className="p-2 rounded-lg bg-rose-50/30 border border-rose-100 flex items-start gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-medium text-stone-900 capitalize block">
+                        {rep.category.replace('_', ' ')}
+                      </span>
+                      <span className="text-[10px] text-stone-500 block truncate max-w-[200px]">
+                        {rep.description}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
 
       </div>
+
+      {/* ============================================================== */}
+      {/* MODAL 1: REPORT STREET HAZARD (Community Intelligence) */}
+      {/* ============================================================== */}
+      {isReportOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-xs">
+          <div className="relative max-w-md w-full rounded-2xl bg-white border border-rose-200 p-6 shadow-xl text-left space-y-4">
+            <button
+              onClick={() => setIsReportOpen(false)}
+              className="absolute top-5 right-5 p-1 rounded-lg text-stone-400 hover:text-stone-700"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-[10px] font-mono">
+                <AlertTriangle className="w-3 h-3 text-amber-600" />
+                <span>Community Hazard Reporting</span>
+              </div>
+              <h3 className="text-lg font-semibold text-stone-900 mt-1">Report a Street Hazard</h3>
+              <p className="text-xs text-stone-500">
+                Help other commuters by reporting dark spots, broken streetlights, or harassment zones.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmitReport} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-stone-700 font-medium mb-1">Hazard Category</label>
+                <select
+                  value={reportCategory}
+                  onChange={(e) => setReportCategory(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg bg-rose-50/20 border border-stone-200 text-stone-900 focus:outline-none focus:border-rose-600 text-xs"
+                >
+                  <option value="broken_streetlight">Broken / Blown Streetlight</option>
+                  <option value="unlit_dark_spot">Unlit Dark Stretch / Blackspot</option>
+                  <option value="harassment">Harassment / Suspicious Gathering</option>
+                  <option value="isolated_area">Isolated / Desolate Alley</option>
+                  <option value="blocked_sidewalk">Blocked Footpath / Barrier</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-stone-700 font-medium mb-1">Street / Landmark Address</label>
+                <input
+                  type="text"
+                  required
+                  value={reportAddress}
+                  onChange={(e) => setReportAddress(e.target.value)}
+                  placeholder="e.g. Near Sikanderpur Metro Pillar 42"
+                  className="w-full px-3 py-2 rounded-lg bg-rose-50/20 border border-stone-200 text-stone-900 focus:outline-none focus:border-rose-600 text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block text-stone-700 font-medium mb-1">Details & Evidence</label>
+                <textarea
+                  required
+                  rows={3}
+                  value={reportDesc}
+                  onChange={(e) => setReportDesc(e.target.value)}
+                  placeholder="Describe what you observed (e.g. 3 consecutive smart poles turned off after 10 PM)."
+                  className="w-full px-3 py-2 rounded-lg bg-rose-50/20 border border-stone-200 text-stone-900 focus:outline-none focus:border-rose-600 text-xs"
+                />
+              </div>
+
+              {reportStatus && (
+                <div className="p-2 rounded bg-rose-50 border border-rose-200 text-rose-800 text-[11px]">
+                  {reportStatus}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full h-9 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span>Submit Street Hazard Report</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================== */}
+      {/* MODAL 2: RATE ROUTE SAFETY (Commuter Feedback) */}
+      {/* ============================================================== */}
+      {isFeedbackOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/40 backdrop-blur-xs">
+          <div className="relative max-w-md w-full rounded-2xl bg-white border border-rose-200 p-6 shadow-xl text-left space-y-4">
+            <button
+              onClick={() => setIsFeedbackOpen(false)}
+              className="absolute top-5 right-5 p-1 rounded-lg text-stone-400 hover:text-stone-700"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-[10px] font-mono">
+                <Star className="w-3 h-3 text-rose-600" />
+                <span>Commuter Route Ground Verification</span>
+              </div>
+              <h3 className="text-lg font-semibold text-stone-900 mt-1">Rate Your Route Experience</h3>
+              <p className="text-xs text-stone-500">
+                Did the actual street match Safie's Night Activity Score? Your rating trains our routing weights.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmitFeedback} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-stone-700 font-medium mb-1">
+                  Perceived Safety (1 to 5 Stars): <strong className="text-rose-600">{feedbackSafety}/5</strong>
+                </label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      type="button"
+                      key={star}
+                      onClick={() => setFeedbackSafety(star)}
+                      className={`w-9 h-8 rounded-lg border font-mono font-medium ${
+                        feedbackSafety >= star
+                          ? 'bg-rose-600 text-white border-rose-600'
+                          : 'bg-stone-50 text-stone-600 border-stone-200'
+                      }`}
+                    >
+                      {star}★
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-stone-700 font-medium mb-1">
+                  Actual Lighting Condition: <strong className="text-rose-600">{feedbackLighting}/5</strong>
+                </label>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      type="button"
+                      key={star}
+                      onClick={() => setFeedbackLighting(star)}
+                      className={`w-9 h-8 rounded-lg border font-mono font-medium ${
+                        feedbackLighting >= star
+                          ? 'bg-amber-500 text-white border-amber-500'
+                          : 'bg-stone-50 text-stone-600 border-stone-200'
+                      }`}
+                    >
+                      {star}★
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-stone-700 font-medium mb-1">Commuter Comments</label>
+                <textarea
+                  rows={2}
+                  value={feedbackComment}
+                  onChange={(e) => setFeedbackComment(e.target.value)}
+                  placeholder="e.g. Well lit until the metro turn; guards were present outside the 24/7 chemist."
+                  className="w-full px-3 py-2 rounded-lg bg-rose-50/20 border border-stone-200 text-stone-900 focus:outline-none focus:border-rose-600 text-xs"
+                />
+              </div>
+
+              {feedbackStatus && (
+                <div className="p-2 rounded bg-rose-50 border border-rose-200 text-rose-800 text-[11px]">
+                  {feedbackStatus}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full h-9 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span>Save Route Rating</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
     </section>
   );

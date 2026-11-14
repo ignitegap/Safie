@@ -73,3 +73,33 @@ CREATE INDEX IF NOT EXISTS idx_safe_havens_coords ON safe_havens(lat, lng);
 CREATE INDEX IF NOT EXISTS idx_road_segments_zone ON road_segments(zone);
 CREATE INDEX IF NOT EXISTS idx_sos_events_status ON sos_events(status);
 
+
+
+-- 6. COMMUNITY HAZARD & INFRASTRUCTURE REPORTS
+CREATE TABLE IF NOT EXISTS community_reports (
+    id VARCHAR(64) PRIMARY KEY,
+    user_id VARCHAR(64),
+    category VARCHAR(50) NOT NULL, -- broken_streetlight, unlit_dark_spot, harassment, isolated_area, blocked_sidewalk
+    lat DECIMAL(10, 6) NOT NULL,
+    lng DECIMAL(10, 6) NOT NULL,
+    address TEXT,
+    description TEXT NOT NULL,
+    status VARCHAR(30) DEFAULT 'submitted', -- submitted, verified, resolved
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 7. ROUTE SAFETY FEEDBACK
+CREATE TABLE IF NOT EXISTS route_feedback (
+    id VARCHAR(64) PRIMARY KEY,
+    user_id VARCHAR(64),
+    route_id VARCHAR(64),
+    origin TEXT,
+    destination TEXT,
+    perceived_safety_rating INT NOT NULL, -- 1 to 5
+    actual_lighting_rating INT NOT NULL, -- 1 to 5
+    comments TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_community_reports_coords ON community_reports(lat, lng);
+CREATE INDEX IF NOT EXISTS idx_route_feedback_created ON route_feedback(created_at);
