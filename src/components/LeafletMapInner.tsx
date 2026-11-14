@@ -44,9 +44,9 @@ export default function LeafletMapInner({
         attributionControl: false,
       });
 
-      // CartoDB Dark Matter / Positron tiles for high-contrast safety rendering
+      // CartoDB Positron: crisp, minimal, high-contrast, non-distracting
       L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+        'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
         {
           maxZoom: 19,
           subdomains: 'abcd',
@@ -84,20 +84,24 @@ export default function LeafletMapInner({
     if (showLighting) {
       GURUGRAM_ROAD_SEGMENTS.forEach((segment) => {
         const isSafe = segment.environmentalScore >= 70;
-        const color = isSafe ? '#10B981' : '#E53935';
-        const weight = isSafe ? 5 : 4;
-        const dashArray = isSafe ? undefined : '6, 6';
+        const color = isSafe ? '#059669' : '#DC2626';
+        const weight = isSafe ? 4 : 3;
+        const dashArray = isSafe ? undefined : '4, 4';
 
         const polyline = L.polyline([segment.startCoord, segment.endCoord], {
           color,
           weight,
-          opacity: 0.85,
+          opacity: 0.8,
           dashArray,
         });
 
         polyline.bindTooltip(
-          `<strong>${segment.name}</strong><br/>Lighting: ${segment.lightingPercentage}% (${segment.lightingStatus})<br/>Score: ${segment.environmentalScore}/100`,
-          { className: 'leaflet-tooltip-dark' }
+          `<div style="font-family: inherit; font-size: 11px; padding: 2px 4px;">
+            <strong>${segment.name}</strong><br/>
+            Lighting: ${segment.lightingPercentage}% (${segment.lightingStatus})<br/>
+            Score: ${segment.environmentalScore}/100
+          </div>`,
+          { className: 'safie-map-tooltip' }
         );
 
         layerGroup.addLayer(polyline);
@@ -107,17 +111,20 @@ export default function LeafletMapInner({
     // 2. Draw Safe Havens
     if (showHavens) {
       DELHI_NCR_SAFE_HAVENS.forEach((haven) => {
+        // Crisp line icon shield SVG without emojis or glowing shadows
         const iconHtml = `
-          <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.8)] border-2 border-white cursor-pointer hover:scale-110 transition-transform">
-            <span style="font-size: 14px;">🛡️</span>
+          <div style="width: 28px; height: 28px; border-radius: 9999px; background-color: #059669; border: 2px solid #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.18); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
           </div>
         `;
 
         const customIcon = L.divIcon({
           html: iconHtml,
           className: 'custom-haven-pin',
-          iconSize: [32, 32],
-          iconAnchor: [16, 16],
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
         });
 
         const marker = L.marker([haven.lat, haven.lng], { icon: customIcon });
@@ -127,21 +134,21 @@ export default function LeafletMapInner({
         });
 
         marker.bindPopup(`
-          <div style="font-family: sans-serif; padding: 4px;">
-            <div style="font-size: 10px; font-weight: bold; color: #10B981; text-transform: uppercase;">
-              ${haven.categoryLabel} · 24/7 VERIFIED
+          <div style="font-family: inherit; padding: 4px 6px; max-width: 220px; color: #1C1917;">
+            <div style="font-size: 10px; font-weight: 600; color: #059669; text-transform: uppercase; letter-spacing: 0.05em;">
+              ${haven.categoryLabel} · Verified 24/7
             </div>
-            <div style="font-size: 13px; font-weight: bold; color: #FFFFFF; margin: 2px 0;">
+            <div style="font-size: 13px; font-weight: 600; margin: 2px 0 4px 0;">
               ${haven.name}
             </div>
-            <div style="font-size: 11px; color: #94A3B8; margin-bottom: 6px;">
+            <div style="font-size: 11px; color: #57534E; margin-bottom: 6px;">
               ${haven.address}
             </div>
-            <div style="font-size: 10px; color: #C084FC; font-weight: 600;">
+            <div style="font-size: 10px; color: #E11D48; font-weight: 600;">
               Codeword: "Ask for Angela"
             </div>
-            <div style="font-size: 10px; color: #38BDF8; margin-top: 4px;">
-              Emergency: ${haven.phone}
+            <div style="font-size: 11px; color: #1C1917; font-weight: 500; margin-top: 4px;">
+              Direct: ${haven.phone}
             </div>
           </div>
         `);
@@ -158,13 +165,17 @@ export default function LeafletMapInner({
 
     if (routeData) {
       const routePolyline = L.polyline(routeData.coordinates, {
-        color: routeType === 'safest' ? '#10B981' : '#E53935',
-        weight: 7,
-        opacity: 0.9,
+        color: routeType === 'safest' ? '#059669' : '#DC2626',
+        weight: 5,
+        opacity: 0.85,
       });
 
       routePolyline.bindTooltip(
-        `<strong>${routeData.title}</strong><br/>Duration: ${routeData.durationMinutes} mins · Distance: ${routeData.distanceKm} km<br/>Lighting: ${routeData.litPercentage}% · Safety Score: ${routeData.score}/100`,
+        `<div style="font-family: inherit; font-size: 11px; padding: 2px 4px;">
+          <strong>${routeData.title}</strong><br/>
+          Duration: ${routeData.durationMinutes} mins · Distance: ${routeData.distanceKm} km<br/>
+          Lighting: ${routeData.litPercentage}% · Safety Score: ${routeData.score}/100
+        </div>`,
         { permanent: false, sticky: true }
       );
 
@@ -175,15 +186,15 @@ export default function LeafletMapInner({
       const endCoord = routeData.coordinates[routeData.coordinates.length - 1];
 
       const startIcon = L.divIcon({
-        html: `<div class="w-6 h-6 rounded-full bg-blue-500 border-2 border-white shadow-lg flex items-center justify-center text-[10px] text-white font-bold">A</div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
+        html: `<div style="width: 22px; height: 22px; border-radius: 9999px; background-color: #2563EB; border: 2px solid #FFFFFF; box-shadow: 0 2px 4px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 10px; color: #FFFFFF; font-weight: 600;">A</div>`,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
       });
 
       const endIcon = L.divIcon({
-        html: `<div class="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white shadow-lg flex items-center justify-center text-[10px] text-white font-bold">B</div>`,
-        iconSize: [24, 24],
-        iconAnchor: [12, 12],
+        html: `<div style="width: 22px; height: 22px; border-radius: 9999px; background-color: #059669; border: 2px solid #FFFFFF; box-shadow: 0 2px 4px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 10px; color: #FFFFFF; font-weight: 600;">B</div>`,
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
       });
 
       layerGroup.addLayer(L.marker(startCoord, { icon: startIcon }));

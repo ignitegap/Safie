@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import {
   Download,
   Smartphone,
-  QrCode,
   Copy,
   Check,
+  CheckCircle2,
 } from 'lucide-react';
 
 export default function DownloadApkSection() {
@@ -20,43 +20,39 @@ export default function DownloadApkSection() {
   };
 
   return (
-    <section id="download" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="download" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
       
-      <div className="rounded-[40px] bg-gradient-to-br from-white via-rose-50/50 to-pink-50/40 border border-rose-200/90 p-8 sm:p-12 shadow-sm relative overflow-hidden">
-        
-        {/* Soft pink ambient background */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-rose-200/30 rounded-full blur-[100px] pointer-events-none" />
-
+      <div className="rounded-2xl bg-white border border-rose-200/80 p-6 sm:p-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           
           {/* Left Column: APK Info & Download */}
-          <div className="lg:col-span-7 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 border border-rose-300 text-rose-700 text-xs font-mono font-bold tracking-wider uppercase">
+          <div className="lg:col-span-7 space-y-5 text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-mono">
               <Smartphone className="w-3.5 h-3.5" />
               <span>Native Android Kotlin Build</span>
             </div>
 
-            <h2 className="text-3xl sm:text-5xl font-black text-stone-900 tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-semibold text-stone-900 tracking-tight">
               Download Safie for Android
             </h2>
 
-            <p className="text-sm sm:text-base text-stone-600 leading-relaxed">
-              Experience zero-latency Safety Hold, background BLE mesh broadcasting, and real-time turn-by-turn navigation on your physical phone. Sideload the release APK directly without Google Play account restrictions.
+            <p className="text-sm text-stone-600 leading-relaxed font-normal">
+              Experience the physical 10-second Safety Hold, background BLE mesh flood relay, and live turn-by-turn corridor navigation directly on your physical Android device. Sideload the release APK without store account dependencies.
             </p>
 
             {/* Spec Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
-              <div className="p-3 rounded-2xl bg-white border border-rose-200 shadow-sm">
-                <span className="text-stone-500 block text-[10px] uppercase font-mono font-bold">Target Platform</span>
-                <strong className="text-stone-900 font-bold">Android 11 - 15</strong>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+              <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100">
+                <span className="text-stone-500 block text-[10px] font-mono">Target Platform</span>
+                <strong className="text-stone-900 font-medium">Android 11 - 15</strong>
               </div>
-              <div className="p-3 rounded-2xl bg-white border border-rose-200 shadow-sm">
-                <span className="text-stone-500 block text-[10px] uppercase font-mono font-bold">Architecture</span>
-                <strong className="text-rose-700 font-bold">arm64-v8a / x86_64</strong>
+              <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100">
+                <span className="text-stone-500 block text-[10px] font-mono">Architecture</span>
+                <strong className="text-stone-900 font-medium">arm64-v8a / x86_64</strong>
               </div>
-              <div className="p-3 rounded-2xl bg-white border border-rose-200 shadow-sm">
-                <span className="text-stone-500 block text-[10px] uppercase font-mono font-bold">Release Build</span>
-                <strong className="text-stone-900 font-mono font-bold">v1.0.0-delhi</strong>
+              <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100">
+                <span className="text-stone-500 block text-[10px] font-mono">Release Build</span>
+                <strong className="text-stone-900 font-mono font-medium">v1.0.0-delhi</strong>
               </div>
             </div>
 
@@ -65,77 +61,78 @@ export default function DownloadApkSection() {
               <a
                 href="/downloads/safie-release.apk"
                 download="Safie-v1.0-delhi-ncr.apk"
-                className="px-8 py-4 rounded-full bg-gradient-to-r from-rose-600 via-rose-500 to-pink-500 hover:from-rose-500 hover:to-pink-600 text-white font-bold text-base shadow-md shadow-rose-200 hover:scale-102 active:scale-95 transition-all flex items-center gap-3"
+                className="h-11 px-6 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-sm transition-colors flex items-center gap-2.5 cursor-pointer"
               >
-                <Download className="w-5 h-5" />
+                <Download className="w-4 h-4" />
                 <span>Download APK (24 MB)</span>
               </a>
               
               <div className="text-xs text-stone-500">
-                <span className="text-emerald-700 font-semibold block">✓ Verified Clean & Safe</span>
-                <span>Self-contained offline bundle</span>
+                <span className="text-emerald-700 font-medium block">Verified clean package</span>
+                <span>Stand-alone offline bundle</span>
               </div>
             </div>
 
             {/* SHA256 Checksum block */}
-            <div className="p-3 rounded-2xl bg-white border border-rose-200 flex items-center justify-between gap-3 text-xs font-mono shadow-sm">
+            <div className="p-3 rounded-xl bg-rose-50/30 border border-rose-100 flex items-center justify-between gap-3 text-xs font-mono">
               <div className="overflow-hidden">
-                <span className="text-stone-400 text-[10px] block font-bold">SHA-256 Checksum:</span>
+                <span className="text-stone-400 text-[10px] block">SHA-256 Checksum:</span>
                 <span className="text-stone-700 truncate block text-[11px]">{checksum}</span>
               </div>
               <button
                 onClick={copyChecksum}
-                className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 transition-colors flex-shrink-0"
+                className="p-1.5 rounded-lg bg-white border border-rose-200 text-stone-600 hover:text-stone-900 transition-colors flex-shrink-0 cursor-pointer"
                 title="Copy Checksum"
               >
-                {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
               </button>
             </div>
 
           </div>
 
-          {/* Right Column: QR Code / Device instructions */}
-          <div className="lg:col-span-5 flex flex-col items-center justify-center p-6 rounded-3xl bg-white border border-rose-200 shadow-sm text-center space-y-4">
+          {/* Right Column: Sideload Guide */}
+          <div className="lg:col-span-5 p-5 rounded-xl bg-rose-50/30 border border-rose-100 text-left space-y-3">
+            <h3 className="text-xs font-mono uppercase text-stone-600 font-medium">
+              3-Step Installation
+            </h3>
             
-            {/* Visual QR Code Representation */}
-            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-stone-900 shadow-sm">
-              <div className="w-44 h-44 bg-white rounded-xl flex flex-col items-center justify-center p-3 relative group border border-rose-100">
-                <QrCode className="w-36 h-36 text-rose-600" />
-                <div className="absolute inset-0 bg-rose-600/10 rounded-xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span className="bg-rose-700 text-white font-mono text-[10px] px-2.5 py-1 rounded-full shadow">
-                    Direct Sideload
-                  </span>
+            <ol className="space-y-3 text-xs text-stone-600">
+              <li className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-white border border-rose-200 text-stone-700 flex items-center justify-center font-mono text-[11px] font-medium flex-shrink-0 mt-0.5">
+                  1
+                </span>
+                <div>
+                  <strong className="text-stone-900 font-medium block">Download APK</strong>
+                  <span>Save `Safie-v1.0-delhi-ncr.apk` to your Android device storage.</span>
                 </div>
-              </div>
-            </div>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-white border border-rose-200 text-stone-700 flex items-center justify-center font-mono text-[11px] font-medium flex-shrink-0 mt-0.5">
+                  2
+                </span>
+                <div>
+                  <strong className="text-stone-900 font-medium block">Permit Sideloading</strong>
+                  <span>Tap "Allow from this source" when prompted by Chrome or Files.</span>
+                </div>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-white border border-rose-200 text-stone-700 flex items-center justify-center font-mono text-[11px] font-medium flex-shrink-0 mt-0.5">
+                  3
+                </span>
+                <div>
+                  <strong className="text-stone-900 font-medium block">Grant Permissions</strong>
+                  <span>Grant Location (Always On for CCMS corridor routing) and Bluetooth (for offline mesh).</span>
+                </div>
+              </li>
+            </ol>
 
-            <div className="space-y-1">
-              <h4 className="text-sm font-bold text-stone-900">Scan from Android Phone</h4>
-              <p className="text-xs text-stone-500 max-w-xs">
-                Scan with your phone camera to download the APK installer directly to your device.
-              </p>
+            <div className="pt-2 border-t border-rose-100 flex items-center gap-1.5 text-xs text-stone-500">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Tested on Samsung OneUI, Pixel OS, and OnePlus OxygenOS</span>
             </div>
-
-            {/* Quick Sideload steps */}
-            <div className="text-left w-full space-y-1.5 text-[11px] text-stone-600 pt-3 border-t border-rose-100">
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-[9px]">1</span>
-                <span>Open downloaded <strong>Safie.apk</strong></span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-[9px]">2</span>
-                <span>Enable <em>"Install Unknown Apps"</em> in settings</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-[9px]">3</span>
-                <span>Allow <em>Location</em> & <em>Nearby Devices (BLE)</em></span>
-              </div>
-            </div>
-
           </div>
 
         </div>
-
       </div>
 
     </section>

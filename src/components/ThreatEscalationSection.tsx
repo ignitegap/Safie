@@ -4,12 +4,12 @@ import React from 'react';
 import {
   ShieldCheck,
   ShieldAlert,
-  AlertTriangle,
-  Flame,
+  AlertCircle,
   PhoneCall,
   Radio,
   Lock,
   ArrowRight,
+  Smartphone,
 } from 'lucide-react';
 
 interface ThreatEscalationSectionProps {
@@ -20,141 +20,126 @@ export default function ThreatEscalationSection({ onOpenDemo }: ThreatEscalation
   const tiers = [
     {
       level: 'Tier 0',
-      title: 'Routine Safe Walk',
-      trigger: 'Normal Navigation',
-      color: 'bg-white border-rose-200 text-stone-900',
-      badgeColor: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-      badge: 'MONITORED',
+      title: 'Monitored Walk',
+      trigger: 'Normal navigation',
+      badge: 'Active Monitoring',
       features: [
-        'Walking route optimized for 96% CCMS street lighting',
-        'Automatic detour suggestion if approaching dark unlit stretch',
-        'Passive scream & distress audio detection active in background',
+        'Route prioritized for CCMS streetlight coverage (96%)',
+        'Automatic reroute if approaching unlit or secluded stretches',
+        'Background distress audio sensor standby',
       ],
     },
     {
       level: 'Tier 1',
       title: 'Safety Hold',
-      trigger: 'Thumb on Button',
-      color: 'bg-white border-rose-200 text-stone-900',
-      badgeColor: 'bg-rose-100 text-rose-800 border-rose-300',
-      badge: 'SAFETY HOLD',
+      trigger: 'Thumb placed on screen',
+      badge: 'Standby Hold',
       features: [
-        'GPS breadcrumb ping rate accelerates to 5s interval',
-        'Nearest 24/7 Safe Haven highlighted with 1-tap detour line',
-        'Pre-recorded escort call ready on 1 tap',
+        'GPS breadcrumb ping accelerates from 30s to 5s interval',
+        'Nearest verified Safe Haven highlighted with 1-tap detour line',
+        'One-tap simulated escort call ready on screen',
       ],
     },
     {
       level: 'Tier 2',
       title: 'Hold Released',
-      trigger: '10s Countdown Timer',
-      color: 'bg-white border-rose-300 text-stone-900 shadow-md',
-      badgeColor: 'bg-rose-600 text-white border-rose-600',
-      badge: '10-SEC TIMER',
+      trigger: '10s countdown window',
+      badge: '10s Grace Window',
       features: [
-        'Vibration & visual 10-second countdown window',
-        'Normal PIN (1234): Verification passed, alert cancels safely',
-        'Duress PIN (9876): Deceptively displays "Cancelled" to aggressor while covertly firing Tier 3 SOS!',
+        'Haptic vibration and visual countdown timer',
+        'Normal PIN (1234): Verification confirmed, alert cancels quietly',
+        'Duress PIN (9876): Deceptively shows "Cancelled" while dispatching Tier 3 emergency',
       ],
     },
     {
       level: 'Tier 3',
-      title: 'Active Crisis',
-      trigger: '0s Reached or 9876',
-      color: 'bg-rose-50/70 border-rose-400 text-stone-900 shadow-md',
-      badgeColor: 'bg-rose-700 text-white border-rose-700',
-      badge: 'DISPATCH ACTIVE',
+      title: 'Emergency Dispatch',
+      trigger: 'Timer expires or PIN 9876',
+      badge: 'Active Dispatch',
       features: [
-        'Emergency dispatch packet sent to 112 / Police Control Room',
-        'Live tracking URLs sent via SMS/WhatsApp to family contacts',
-        'Silent microphone audio streaming + offline BLE mesh broadcast',
+        'Encrypted SOS packet dispatched to 112 Police Control Room',
+        'Live tracking links sent via SMS to trusted emergency contacts',
+        'Silent microphone audio streaming and offline BLE mesh broadcast',
       ],
     },
   ];
 
   return (
-    <section id="threat-tiers" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+    <section id="threat-tiers" className="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
       
-      <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 border border-rose-300 text-rose-700 text-xs font-mono font-bold tracking-wider uppercase">
+      <div className="text-center max-w-2xl mx-auto mb-10 space-y-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-rose-200/80 text-rose-700 text-xs font-mono">
           <ShieldAlert className="w-3.5 h-3.5" />
           <span>Graduated Escalation Engine</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
-          Why Standard Panic Buttons Don't Work
+        <h2 className="text-2xl sm:text-3xl font-semibold text-stone-900 tracking-tight">
+          Protection before physical confrontation
         </h2>
-        <p className="text-base text-stone-600">
-          Unlocking a phone during an assault or surprise confrontation is virtually impossible. Safie protects you before violence happens.
+        <p className="text-sm text-stone-600">
+          Unlocking a phone during a surprise physical confrontation is virtually impossible. Safie arms users with a dead man's switch.
         </p>
       </div>
 
       {/* 4 Tiers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {tiers.map((t, idx) => (
           <div
             key={idx}
-            className={`p-6 rounded-3xl border flex flex-col justify-between transition-all duration-300 hover:shadow-lg hover:border-rose-300 ${t.color}`}
+            className="p-5 rounded-2xl border border-rose-200/80 bg-white flex flex-col justify-between space-y-4"
           >
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono font-black uppercase tracking-wider px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200">
+                <span className="text-[11px] font-mono font-medium text-stone-500">
                   {t.level}
                 </span>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${t.badgeColor}`}>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-100">
                   {t.badge}
                 </span>
               </div>
 
               <div>
-                <h3 className="text-lg font-black text-stone-900">{t.title}</h3>
-                <p className="text-xs text-stone-500 mt-1">
-                  Trigger: <span className="text-stone-800 font-semibold">{t.trigger}</span>
-                </p>
+                <h3 className="text-base font-semibold text-stone-900">{t.title}</h3>
+                <p className="text-xs text-stone-500 mt-0.5 font-mono">{t.trigger}</p>
               </div>
 
-              <div className="space-y-2.5 pt-2">
-                {t.features.map((feat, fIdx) => (
-                  <div key={fIdx} className="flex items-start gap-2 text-xs text-stone-600">
-                    <span className="font-bold text-rose-500 mt-0.5">•</span>
-                    <span className="leading-snug">{feat}</span>
-                  </div>
+              <ul className="space-y-2 pt-2 border-t border-rose-100/70 text-xs text-stone-600">
+                {t.features.map((f, fIdx) => (
+                  <li key={fIdx} className="flex items-start gap-2 leading-relaxed">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 flex-shrink-0 mt-1.5" />
+                    <span>{f}</span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
-            <div className="pt-6 mt-4 border-t border-rose-100">
-              <button
-                onClick={onOpenDemo}
-                className="w-full py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-700 transition-all flex items-center justify-center gap-1.5 border border-rose-200"
-              >
-                <span>Test in Phone Simulator</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+            <div className="pt-2 text-[11px] font-mono text-stone-400">
+              Response: Sub-100ms
             </div>
           </div>
         ))}
       </div>
 
-      {/* Anti-Coercion Protocol Highlight Card */}
-      <div className="mt-10 p-6 sm:p-8 rounded-3xl bg-white border border-rose-300 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-2 text-left max-w-2xl">
-          <div className="flex items-center gap-2">
-            <Lock className="w-5 h-5 text-rose-600" />
-            <h4 className="text-lg font-black text-stone-900">
-              The Duress PIN Innovation (Anti-Coercion Protocol)
-            </h4>
+      {/* Simulator Link Card */}
+      <div className="mt-6 p-4 rounded-xl bg-white border border-rose-200/80 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3 text-left">
+          <div className="w-8 h-8 rounded-lg bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 flex-shrink-0">
+            <Smartphone className="w-4 h-4" />
           </div>
-          <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-            When confronted, aggressors often demand that victims cancel alarms on their phone. Entering Safie's Duress PIN (<code className="text-rose-700 font-mono font-bold bg-rose-100 px-1.5 py-0.5 rounded border border-rose-300">9876</code>) renders an authentic-looking <strong className="text-emerald-800">"Alarm Cancelled — Safe"</strong> screen to satisfy the attacker, while secretly transmitting a high-priority red alert with live GPS coordinates to Gurugram Police and emergency contacts.
-          </p>
+          <div>
+            <span className="text-xs font-semibold text-stone-900 block">
+              Experience the 10-Second Safety Hold
+            </span>
+            <span className="text-xs text-stone-500 block">
+              Test normal PIN (1234) vs covert duress PIN (9876) in the interactive phone simulator.
+            </span>
+          </div>
         </div>
-
         <button
           onClick={onOpenDemo}
-          className="px-6 py-3 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider flex-shrink-0 shadow-md flex items-center gap-2"
+          className="h-9 px-4 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs flex items-center gap-2 transition-colors cursor-pointer flex-shrink-0"
         >
-          <span>Try Duress PIN (9876)</span>
-          <ArrowRight className="w-4 h-4" />
+          <span>Open Simulator</span>
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
 

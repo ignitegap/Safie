@@ -1,15 +1,14 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import {
   Smartphone,
   Download,
-  CheckCircle2,
   ArrowRight,
   Shield,
   Lightbulb,
-  Lock,
+  Clock,
+  Radio,
 } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -19,125 +18,123 @@ interface HeroSectionProps {
 
 export default function HeroSection({ onOpenDemo, onOpenAuth }: HeroSectionProps) {
   return (
-    <section id="hero" className="relative pt-12 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto overflow-hidden">
-      
-      {/* Soft warm pink glow in background */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] bg-rose-200/40 rounded-full blur-[140px] pointer-events-none -z-10" />
-      <div className="absolute top-1/3 left-1/6 w-[350px] h-[350px] bg-pink-100/60 rounded-full blur-[100px] pointer-events-none -z-10" />
-
-      <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto">
+    <section id="hero" className="pt-16 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+      <div className="flex flex-col items-center text-center space-y-6 max-w-3xl mx-auto">
         
-        {/* Soft Pink Pill */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-rose-200 shadow-sm">
-          <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
-          <span className="text-xs font-bold tracking-wide text-stone-700">
-            Delhi · Gurugram Pedestrian Safety Network
-          </span>
-          <span className="text-[10px] font-bold text-rose-600 uppercase bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
-            Live v1.0
-          </span>
+        {/* Territory Status Tag */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-rose-200/80 text-xs font-mono text-stone-600">
+          <span className="w-2 h-2 rounded-full bg-rose-600" />
+          <span>Delhi NCR · Gurugram CCMS Integration</span>
         </div>
 
-        {/* Main Headline */}
-        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-stone-900 tracking-tight leading-[1.08]">
-          Google Maps routes for speed.{' '}
-          <span className="bg-gradient-to-r from-rose-600 via-pink-600 to-rose-500 bg-clip-text text-transparent">
-            Safie routes for your peace of mind.
-          </span>
+        {/* Calm, Grounded Headline */}
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-stone-900 tracking-tight leading-[1.15]">
+          Pedestrian routing for safety, not just speed.
         </h1>
 
-        {/* Sub-headline - Human, non-slop */}
-        <p className="text-base sm:text-xl text-stone-600 max-w-2xl leading-relaxed font-normal">
-          Designed specifically for walking after dark in Gurugram and South Delhi. Powered by real street lighting telemetry, a 10-second safety hold, and verified 24/7 safe refuges.
+        {/* Clear, Specific Subhead */}
+        <p className="text-base sm:text-lg text-stone-600 max-w-2xl leading-relaxed font-normal">
+          Designed for commuters and women walking after dark in Delhi and Gurugram. Routes prioritize verified illuminated streets, a 10-second dead man's switch, and 24/7 guarded sanctuaries.
         </p>
 
-        {/* Action Controls */}
-        <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
-          
-          {/* THE DEMO TRIGGER */}
+        {/* Primary and Secondary Actions Only */}
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          {/* Primary Action */}
           <button
             onClick={onOpenDemo}
-            className="group px-7 py-4 rounded-full bg-gradient-to-r from-rose-600 via-rose-500 to-pink-500 hover:from-rose-500 hover:to-pink-600 text-white font-bold text-base shadow-[0_8px_30px_rgba(225,29,72,0.35)] hover:shadow-[0_12px_40px_rgba(225,29,72,0.45)] hover:scale-102 active:scale-95 transition-all duration-200 flex items-center gap-3 cursor-pointer"
+            className="h-11 px-5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-sm flex items-center gap-2 transition-colors cursor-pointer"
           >
-            <Smartphone className="w-5 h-5" />
-            <span>Try Interactive Phone Demo</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <Smartphone className="w-4 h-4 text-white" />
+            <span>Launch Phone Simulator</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
 
-          {/* DOWNLOAD APK */}
+          {/* Secondary Action */}
           <a
             href="/downloads/safie-release.apk"
             download="Safie-v1.0-delhi-ncr.apk"
-            className="px-6 py-4 rounded-full bg-white hover:bg-rose-50 text-stone-800 font-bold text-base border border-rose-200 hover:border-rose-300 transition-all flex items-center gap-2.5 shadow-sm"
+            className="h-11 px-5 rounded-lg bg-white hover:bg-rose-50 text-stone-800 font-medium text-sm border border-rose-200 hover:border-rose-300 transition-colors flex items-center gap-2"
           >
-            <Download className="w-5 h-5 text-rose-600" />
+            <Download className="w-4 h-4 text-stone-500" />
             <span>Download Android APK</span>
-            <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-rose-100 text-rose-700 font-bold">
-              v1.0
-            </span>
+            <span className="text-[11px] font-mono text-stone-400">v1.0</span>
           </a>
-
         </div>
 
-        {/* Non-slop real product highlights */}
-        <div className="flex flex-wrap items-center justify-center gap-6 pt-3 text-xs font-semibold text-stone-600">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-rose-500" />
-            <span>10s Dead Man's Switch</span>
+        {/* Real Product Architecture Points */}
+        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-2 text-xs text-stone-500">
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+            <span>10-second Safety Hold switch</span>
           </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-rose-500" />
-            <span>Covert Duress PIN (9876)</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+            <span>Duress PIN 9876 alert</span>
           </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-rose-500" />
-            <span>"Ask for Angela" Verified Havens</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+            <span>28 verified safe havens</span>
           </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-rose-500" />
-            <span>Zero-Data BLE Mesh Fallback</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+            <span>Offline BLE mesh fallback</span>
           </div>
         </div>
 
-        {/* Real Metrics Cards in Pinkish Clean Editorial Layout */}
-        <div className="w-full max-w-5xl mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-3xl bg-white/90 border border-rose-200/80 shadow-sm backdrop-blur-md">
+        {/* Real Metrics Row on 4px Grid */}
+        <div className="w-full mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 p-3 rounded-2xl bg-white border border-rose-200/80">
           
-          <div className="text-left p-4 rounded-2xl bg-rose-50/50 border border-rose-100/70">
-            <span className="text-[10px] font-mono uppercase font-bold text-rose-600">
+          <div className="text-left p-3.5 rounded-xl bg-rose-50/40 border border-rose-100/60">
+            <span className="text-[11px] font-mono text-stone-500 block">
               Streetlights Mapped
             </span>
-            <p className="text-2xl sm:text-3xl font-black text-stone-900 font-mono mt-1">65,000+</p>
-            <p className="text-xs text-stone-500 mt-0.5">GMDA CCMS Smart Poles</p>
+            <span className="text-2xl font-semibold text-stone-900 font-mono tracking-tight block mt-1 tabular-nums">
+              65,420
+            </span>
+            <span className="text-[11px] text-stone-500 block mt-0.5">
+              GMDA CCMS Smart Poles
+            </span>
           </div>
 
-          <div className="text-left p-4 rounded-2xl bg-rose-50/50 border border-rose-100/70">
-            <span className="text-[10px] font-mono uppercase font-bold text-rose-600">
+          <div className="text-left p-3.5 rounded-xl bg-rose-50/40 border border-rose-100/60">
+            <span className="text-[11px] font-mono text-stone-500 block">
               Safe Sanctuaries
             </span>
-            <p className="text-2xl sm:text-3xl font-black text-stone-900 font-mono mt-1">28+</p>
-            <p className="text-xs text-stone-500 mt-0.5">24/7 Pharmacies & Police Desks</p>
+            <span className="text-2xl font-semibold text-stone-900 font-mono tracking-tight block mt-1 tabular-nums">
+              28
+            </span>
+            <span className="text-[11px] text-stone-500 block mt-0.5">
+              24/7 Verified Counters
+            </span>
           </div>
 
-          <div className="text-left p-4 rounded-2xl bg-rose-50/50 border border-rose-100/70">
-            <span className="text-[10px] font-mono uppercase font-bold text-rose-600">
-              Response Window
+          <div className="text-left p-3.5 rounded-xl bg-rose-50/40 border border-rose-100/60">
+            <span className="text-[11px] font-mono text-stone-500 block">
+              Route Detour Cap
             </span>
-            <p className="text-2xl sm:text-3xl font-black text-rose-600 font-mono mt-1">10s</p>
-            <p className="text-xs text-stone-500 mt-0.5">Auto-Dispatch on Hold Release</p>
+            <span className="text-2xl font-semibold text-stone-900 font-mono tracking-tight block mt-1 tabular-nums">
+              +2.5 min
+            </span>
+            <span className="text-[11px] text-stone-500 block mt-0.5">
+              Maximum Pedestrian Delta
+            </span>
           </div>
 
-          <div className="text-left p-4 rounded-2xl bg-rose-50/50 border border-rose-100/70">
-            <span className="text-[10px] font-mono uppercase font-bold text-rose-600">
-              Network Resilience
+          <div className="text-left p-3.5 rounded-xl bg-rose-50/40 border border-rose-100/60">
+            <span className="text-[11px] font-mono text-stone-500 block">
+              SOS Latency
             </span>
-            <p className="text-2xl sm:text-3xl font-black text-stone-900 font-mono mt-1">0-Data</p>
-            <p className="text-xs text-stone-500 mt-0.5">Offline Multi-Hop BLE Mesh</p>
+            <span className="text-2xl font-semibold text-stone-900 font-mono tracking-tight block mt-1 tabular-nums">
+              42 ms
+            </span>
+            <span className="text-[11px] text-stone-500 block mt-0.5">
+              Neon Cloud Edge Relay
+            </span>
           </div>
 
         </div>
 
       </div>
-
     </section>
   );
 }

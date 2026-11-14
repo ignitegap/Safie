@@ -15,7 +15,6 @@ import {
   RotateCcw,
   Compass,
   ArrowRight,
-  Sparkles,
   Lock,
   Unlock,
   Building,
@@ -25,6 +24,7 @@ import {
   Signal,
   Wifi,
   Battery,
+  MessageSquare,
 } from 'lucide-react';
 import { DELHI_NCR_SAFE_HAVENS } from '@/lib/data-delhi-ncr';
 
@@ -82,10 +82,10 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
         setCountdown(countdown - 1);
       }, 1000);
     } else if (countdown === 0) {
-      // Countdown expired: Auto-trigger Level 3 SOS!
+      // Countdown expired: Auto-trigger Level 3 SOS
       setPinFeedback({
         status: 'duress',
-        message: '🚨 10s Expired! Emergency SOS Dispatched with GPS to Gurugram Police Control Room & Contacts!',
+        message: '10s Window Expired: Emergency SOS packet dispatched with live GPS to Police Control Room and registered contacts.',
       });
     }
     return () => clearTimeout(timer);
@@ -134,13 +134,13 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
       setCountdown(null);
       setPinFeedback({
         status: 'duress',
-        message: 'Alarm Cancelled. (Deceptive display to aggressor. Covert high-priority alert sent to Police & Emergency Contacts with live GPS)',
+        message: 'Alarm Cancelled. (Deceptive confirmation displayed. High-priority covert alert dispatched to Police & emergency contacts with live GPS coordinates)',
       });
       setPinInput('');
     } else {
       setPinFeedback({
         status: 'error',
-        message: 'Incorrect PIN! Try 1234 (Normal Disarm) or 9876 (Duress PIN)',
+        message: 'Incorrect PIN. Try 1234 (Normal Disarm) or 9876 (Duress PIN).',
       });
     }
   };
@@ -148,67 +148,65 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-stone-900/60 backdrop-blur-md animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-stone-900/40 backdrop-blur-xs overflow-y-auto">
       
-      {/* Container with control overlay */}
+      {/* Container */}
       <div className="relative max-w-4xl w-full flex flex-col md:flex-row items-center justify-center gap-6 py-4">
         
         {/* Floating Close Button */}
         <button
           onClick={onClose}
-          className="absolute -top-2 right-2 md:-top-3 md:-right-3 z-50 p-2.5 rounded-full bg-white text-stone-700 hover:bg-rose-600 hover:text-white transition-all border border-rose-200 shadow-xl"
-          aria-label="Close interactive phone demo"
+          className="absolute -top-2 right-2 md:-top-3 md:-right-3 z-50 p-2 rounded-full bg-white text-stone-700 hover:bg-stone-100 transition-colors border border-rose-200 shadow-md cursor-pointer"
+          aria-label="Close phone simulator"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* ============================================================== */}
-        {/* PHYSICAL PHONE SHELL (Elegantly Styled with Rose Bezel) */}
+        {/* PHYSICAL PHONE SHELL (Calm, Matte Bezel) */}
         {/* ============================================================== */}
-        <div className="relative w-[340px] sm:w-[365px] h-[710px] rounded-[52px] p-3.5 bg-gradient-to-b from-[#2E1F27] via-[#1F131A] to-[#12080E] pink-phone-shadow border-[4px] border-[#5E2B47] shadow-2xl flex-shrink-0 select-none">
+        <div className="relative w-[340px] sm:w-[360px] h-[690px] rounded-[48px] p-3 bg-stone-900 border-[3px] border-stone-800 shadow-2xl flex-shrink-0 select-none">
           
           {/* Side Buttons */}
-          <div className="absolute -left-[7px] top-28 w-[3px] h-10 bg-rose-900/80 rounded-l-sm" />
-          <div className="absolute -left-[7px] top-42 w-[3px] h-12 bg-rose-900/80 rounded-l-sm" />
-          <div className="absolute -right-[7px] top-32 w-[3px] h-16 bg-rose-900/80 rounded-r-sm" />
+          <div className="absolute -left-[5px] top-28 w-[2px] h-10 bg-stone-700 rounded-l-sm" />
+          <div className="absolute -left-[5px] top-42 w-[2px] h-12 bg-stone-700 rounded-l-sm" />
+          <div className="absolute -right-[5px] top-32 w-[2px] h-16 bg-stone-700 rounded-r-sm" />
 
-          {/* Screen Area (Clean Blush & Rose Palette) */}
-          <div className="relative w-full h-full bg-[#FFF5F7] rounded-[44px] overflow-hidden flex flex-col text-stone-900">
+          {/* Screen Area */}
+          <div className="relative w-full h-full bg-[#FFF5F6] rounded-[40px] overflow-hidden flex flex-col text-stone-900">
             
             {/* Dynamic Island / Status Bar */}
-            <div className="h-11 px-6 pt-2 flex items-center justify-between text-xs font-semibold text-stone-700 z-30 select-none">
-              <span className="font-mono text-[13px]">{timeStr}</span>
+            <div className="h-10 px-5 pt-2 flex items-center justify-between text-xs font-medium text-stone-600 z-30 select-none">
+              <span className="font-mono text-[12px]">{timeStr}</span>
               
               {/* Dynamic Island Pill */}
-              <div className="w-24 h-5 bg-stone-900 rounded-full flex items-center justify-center gap-1.5 px-2 text-white">
-                <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                <span className="text-[9px] font-mono text-rose-300 font-bold">Safie Active</span>
+              <div className="w-22 h-4.5 bg-stone-900 rounded-full flex items-center justify-center gap-1.5 px-2 text-white">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                <span className="text-[9px] font-mono text-stone-300">Safie Active</span>
               </div>
 
               {/* Status Icons */}
-              <div className="flex items-center gap-1.5 text-stone-700">
-                <Signal className="w-3.5 h-3.5" />
-                <Wifi className="w-3.5 h-3.5" />
-                <Battery className="w-4 h-4 text-emerald-600" />
+              <div className="flex items-center gap-1.5 text-stone-600">
+                <Signal className="w-3 h-3" />
+                <Wifi className="w-3 h-3" />
+                <Battery className="w-3.5 h-3.5 text-emerald-600" />
               </div>
             </div>
 
             {/* SCREEN BODY CONTENT SWITCHER */}
             <div className="flex-1 overflow-y-auto px-4 py-2 relative text-left">
               
-              {/* ============================================================== */}
               {/* TAB 1: NAVIGATION & SMART ROUTING */}
-              {/* ============================================================== */}
               {activeTab === 'navigation' && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-mono text-rose-600 font-bold uppercase tracking-wider">
+                      <span className="text-[10px] font-mono text-stone-500 uppercase">
                         Delhi-NCR Safe Corridor
                       </span>
-                      <h3 className="text-base font-bold text-stone-900">Cyber City ➔ Sector 29</h3>
+                      <h3 className="text-sm font-semibold text-stone-900">Cyber City to Sector 29</h3>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
                       96% Lit
                     </span>
                   </div>
@@ -217,81 +215,80 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                   <div className="grid grid-cols-2 gap-2 text-left">
                     <button
                       onClick={() => setSelectedRoute('safest')}
-                      className={`p-2.5 rounded-2xl border text-left transition-all relative ${
+                      className={`p-2.5 rounded-xl border text-left transition-colors cursor-pointer ${
                         selectedRoute === 'safest'
-                          ? 'bg-white border-rose-500 shadow-md ring-2 ring-rose-200'
-                          : 'bg-rose-50/50 border-rose-200/60 hover:border-rose-300'
+                          ? 'bg-white border-rose-600 ring-1 ring-rose-200'
+                          : 'bg-rose-50/30 border-rose-100 hover:border-rose-200'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-bold text-rose-600">Safest Way</span>
+                        <span className="text-xs font-semibold text-rose-700">Safest</span>
                         {selectedRoute === 'safest' && (
                           <CheckCircle2 className="w-3.5 h-3.5 text-rose-600" />
                         )}
                       </div>
-                      <p className="text-lg font-black text-stone-900 leading-none">14 min</p>
-                      <p className="text-[10px] text-stone-500 mt-1">4.2 km · 96% Lit</p>
-                      <div className="mt-1.5 text-[9px] text-emerald-700 font-semibold">
-                        4 Safe Havens on route
+                      <p className="text-base font-semibold text-stone-900 font-mono">14 min</p>
+                      <p className="text-[10px] text-stone-500 mt-0.5">4.2 km · 96% Lit</p>
+                      <div className="mt-1 text-[9px] text-emerald-700 font-medium">
+                        4 havens on route
                       </div>
                     </button>
 
                     <button
                       onClick={() => setSelectedRoute('fastest')}
-                      className={`p-2.5 rounded-2xl border text-left transition-all relative ${
+                      className={`p-2.5 rounded-xl border text-left transition-colors cursor-pointer ${
                         selectedRoute === 'fastest'
-                          ? 'bg-white border-stone-800 shadow-md'
-                          : 'bg-rose-50/50 border-rose-200/60 hover:border-rose-300 opacity-80'
+                          ? 'bg-white border-stone-800 ring-1 ring-stone-200'
+                          : 'bg-rose-50/30 border-rose-100 hover:border-rose-200 opacity-80'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-bold text-stone-600">Standard</span>
+                        <span className="text-xs font-medium text-stone-600">Standard</span>
                         {selectedRoute === 'fastest' && (
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                          <AlertTriangle className="w-3.5 h-3.5 text-stone-700" />
                         )}
                       </div>
-                      <p className="text-lg font-black text-stone-900 leading-none">11 min</p>
-                      <p className="text-[10px] text-stone-500 mt-1">3.8 km · 42% Lit</p>
-                      <div className="mt-1.5 text-[9px] text-rose-600 font-semibold">
-                        2 Dark Alleys
+                      <p className="text-base font-semibold text-stone-900 font-mono">11 min</p>
+                      <p className="text-[10px] text-stone-500 mt-0.5">3.8 km · 42% Lit</p>
+                      <div className="mt-1 text-[9px] text-stone-500">
+                        2 unlit segments
                       </div>
                     </button>
                   </div>
 
                   {/* Simulated Mini Map Visual */}
-                  <div className="relative h-44 rounded-2xl overflow-hidden bg-rose-100/60 border border-rose-200 p-2.5 flex flex-col justify-between">
-                    <div className="relative z-10 space-y-1.5">
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-3 h-3 rounded-full bg-rose-600 animate-ping" />
-                        <span className="font-bold text-stone-800">Cyber City Rapid Metro</span>
+                  <div className="h-40 rounded-xl overflow-hidden bg-rose-50 border border-rose-100 p-2.5 flex flex-col justify-between">
+                    <div className="space-y-1 text-xs">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-rose-600" />
+                        <span className="font-medium text-stone-800">Cyber City Rapid Metro</span>
                       </div>
                       
-                      {/* Active Safety Route Line */}
-                      <div className="ml-1.5 pl-3 border-l-2 border-rose-500 py-1 space-y-1">
-                        <div className="flex items-center gap-1.5 text-[10px] text-rose-700 font-semibold">
+                      <div className="ml-1 pl-2.5 border-l border-rose-300 py-1 space-y-1">
+                        <div className="flex items-center gap-1 text-[10px] text-rose-700">
                           <Building className="w-3 h-3" />
-                          <span>Apollo Pharmacy 24/7 (Refuge Zone)</span>
+                          <span>Apollo Pharmacy (Refuge)</span>
                         </div>
                         <div className="text-[10px] text-stone-500">
                           Via DLF Phase 2 Lit Corridor
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs">
-                        <div className="w-3 h-3 rounded-full bg-emerald-600" />
-                        <span className="font-bold text-stone-800">Sector 29 Leisure Valley</span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                        <span className="font-medium text-stone-800">Sector 29 Leisure Valley</span>
                       </div>
                     </div>
 
-                    <div className="relative z-10 p-2 rounded-xl bg-white/95 border border-rose-200 flex items-center justify-between text-xs shadow-sm">
+                    <div className="p-1.5 rounded-lg bg-white border border-rose-100 flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1.5">
-                        <Shield className="w-4 h-4 text-rose-600" />
-                        <span className="text-[11px] font-bold text-stone-800">
+                        <Shield className="w-3.5 h-3.5 text-rose-600" />
+                        <span className="text-[10px] font-medium text-stone-800">
                           Active Safe Corridor
                         </span>
                       </div>
-                      <span className="text-[10px] font-mono text-emerald-700 font-bold">
-                        Score: 94/100
+                      <span className="text-[10px] font-mono text-emerald-700">
+                        Score 94/100
                       </span>
                     </div>
                   </div>
@@ -299,67 +296,63 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                   {/* Navigation Action */}
                   <button
                     onClick={() => setIsNavigating(!isNavigating)}
-                    className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                    className={`w-full h-9 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer ${
                       isNavigating
-                        ? 'bg-stone-900 text-white shadow-md'
-                        : 'bg-rose-600 hover:bg-rose-500 text-white shadow-md shadow-rose-200'
+                        ? 'bg-stone-900 text-white'
+                        : 'bg-rose-600 hover:bg-rose-700 text-white'
                     }`}
                   >
-                    <Navigation className="w-4 h-4" />
-                    <span>{isNavigating ? 'End Walking Guidance' : 'Start Live Escort Walk'}</span>
+                    <Navigation className="w-3.5 h-3.5" />
+                    <span>{isNavigating ? 'End Escort Guidance' : 'Start Escort Guidance'}</span>
                   </button>
                 </div>
               )}
 
-              {/* ============================================================== */}
-              {/* TAB 2: SAFETY HOLD (DEAD MAN'S SWITCH & DURESS PIN) */}
-              {/* ============================================================== */}
+              {/* TAB 2: SAFETY HOLD */}
               {activeTab === 'safety-hold' && (
                 <div className="space-y-3 flex flex-col items-center text-center">
                   <div>
-                    <span className="text-[10px] font-mono text-rose-600 font-bold uppercase tracking-wider">
+                    <span className="text-[10px] font-mono text-stone-500 uppercase">
                       Dead Man's Switch Engine
                     </span>
-                    <h3 className="text-base font-bold text-stone-900">Safety Hold</h3>
-                    <p className="text-[11px] text-stone-500 max-w-[270px] mx-auto mt-0.5 leading-snug">
-                      Hold thumb down while walking. Releasing initiates an urgent 10-second countdown.
+                    <h3 className="text-sm font-semibold text-stone-900">Safety Hold</h3>
+                    <p className="text-[11px] text-stone-500 max-w-[240px] mx-auto mt-0.5 leading-snug">
+                      Hold thumb down while walking. Releasing initiates a 10-second countdown.
                     </p>
                   </div>
 
-                  {/* Tactical Hold Trigger Button */}
+                  {/* Tactile Hold Trigger Button */}
                   {countdown === null && (
-                    <div className="py-3">
+                    <div className="py-2">
                       <button
                         onMouseDown={handleTouchStart}
                         onMouseUp={handleTouchEnd}
                         onTouchStart={handleTouchStart}
                         onTouchEnd={handleTouchEnd}
-                        className={`w-36 h-36 rounded-full font-black text-xs uppercase tracking-wider flex flex-col items-center justify-center gap-2 transition-all select-none cursor-pointer ${
+                        className={`w-32 h-32 rounded-full font-semibold text-xs flex flex-col items-center justify-center gap-1.5 transition-colors select-none cursor-pointer ${
                           isHolding
-                            ? 'bg-rose-700 text-white scale-105 shadow-[0_0_35px_rgba(225,29,72,0.8)] pink-pulse-ring'
-                            : 'bg-gradient-to-tr from-rose-600 via-rose-500 to-pink-500 text-white shadow-[0_8px_30px_rgba(225,29,72,0.4)] hover:scale-102 active:scale-95'
+                            ? 'bg-rose-800 text-white ring-4 ring-rose-200'
+                            : 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm'
                         }`}
                       >
-                        <ShieldAlert className="w-9 h-9" />
-                        <span>{isHolding ? 'HOLDING...' : 'HOLD THUMB'}</span>
-                        <span className="text-[9px] font-normal normal-case opacity-90">
-                          {isHolding ? 'Protected & Live' : 'Release = 10s Timer'}
+                        <ShieldAlert className="w-8 h-8 text-white" />
+                        <span>{isHolding ? 'Holding' : 'Hold Thumb'}</span>
+                        <span className="text-[9px] opacity-80 font-normal">
+                          {isHolding ? 'Monitoring live' : 'Release = 10s Timer'}
                         </span>
                       </button>
                     </div>
                   )}
 
-                  {/* Urgent 10s Countdown Alert Window */}
+                  {/* 10s Countdown Alert Window */}
                   {countdown !== null && (
-                    <div className="w-full p-3 rounded-2xl bg-rose-600 text-white space-y-1.5 shadow-xl animate-pulse">
-                      <div className="flex items-center justify-center gap-2">
-                        <AlertTriangle className="w-5 h-5 text-white" />
-                        <span className="font-black text-sm tracking-wider uppercase">
-                          Safety Hold Released!
-                        </span>
+                    <div className="w-full p-3 rounded-xl bg-rose-600 text-white space-y-1">
+                      <div className="flex items-center justify-center gap-1.5 text-xs font-semibold">
+                        <AlertTriangle className="w-4 h-4 text-white" />
+                        <span>Safety Hold Released</span>
                       </div>
                       
-                      <div className="text-4xl font-black font-mono tracking-widest">
+                      <div className="text-3xl font-semibold font-mono tracking-widest tabular-nums">
                         00:{countdown < 10 ? `0${countdown}` : countdown}
                       </div>
 
@@ -370,7 +363,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                   )}
 
                   {/* PIN Input Keypad */}
-                  <div className="w-full max-w-[240px] space-y-2">
+                  <div className="w-full max-w-[220px] space-y-2">
                     <div className="flex items-center justify-center gap-1.5">
                       <input
                         type="password"
@@ -378,11 +371,11 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                         placeholder="••••"
                         value={pinInput}
                         onChange={(e) => setPinInput(e.target.value)}
-                        className="w-28 text-center tracking-widest text-lg font-mono font-bold bg-white border border-rose-300 rounded-xl p-1.5 text-stone-900 focus:outline-none focus:border-rose-600"
+                        className="w-24 text-center tracking-widest text-base font-mono bg-white border border-rose-200 rounded-lg p-1.5 text-stone-900 focus:outline-none focus:border-rose-600"
                       />
                       <button
                         onClick={() => handlePinSubmit(pinInput)}
-                        className="px-3.5 py-1.5 rounded-xl bg-rose-600 text-white text-xs font-bold hover:bg-rose-700 shadow-sm"
+                        className="h-8 px-3 rounded-lg bg-rose-600 text-white text-xs font-medium hover:bg-rose-700 transition-colors cursor-pointer"
                       >
                         Verify
                       </button>
@@ -392,27 +385,27 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     <div className="flex items-center justify-center gap-2 text-[10px]">
                       <button
                         onClick={() => handlePinSubmit('1234')}
-                        className="px-2 py-1 rounded-lg bg-white text-stone-700 hover:text-stone-900 border border-rose-200 font-medium"
+                        className="px-2 py-1 rounded bg-white text-stone-700 border border-stone-200 hover:bg-stone-50 cursor-pointer"
                       >
-                        Normal: <strong className="text-emerald-700 font-mono">1234</strong>
+                        Normal: <span className="font-mono text-emerald-700 font-medium">1234</span>
                       </button>
                       <button
                         onClick={() => handlePinSubmit('9876')}
-                        className="px-2 py-1 rounded-lg bg-rose-50 text-rose-800 hover:text-rose-900 border border-rose-300 font-medium"
+                        className="px-2 py-1 rounded bg-rose-50 text-stone-700 border border-rose-200 hover:bg-rose-100 cursor-pointer"
                       >
-                        Duress: <strong className="text-rose-600 font-mono">9876</strong>
+                        Duress: <span className="font-mono text-rose-700 font-medium">9876</span>
                       </button>
                     </div>
 
-                    {/* PIN Feedback / Duress Result */}
+                    {/* Feedback */}
                     {pinFeedback.message && (
                       <div
-                        className={`p-2.5 rounded-xl text-[10px] text-left leading-relaxed ${
+                        className={`p-2 rounded-lg text-[10px] text-left leading-normal ${
                           pinFeedback.status === 'success'
-                            ? 'bg-emerald-50 border border-emerald-300 text-emerald-800'
+                            ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
                             : pinFeedback.status === 'duress'
-                            ? 'bg-rose-50 border border-rose-300 text-rose-900'
-                            : 'bg-red-50 border border-red-300 text-red-800'
+                            ? 'bg-rose-50 border border-rose-200 text-rose-900'
+                            : 'bg-stone-100 border border-stone-200 text-stone-800'
                         }`}
                       >
                         {pinFeedback.message}
@@ -422,58 +415,52 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                 </div>
               )}
 
-              {/* ============================================================== */}
-              {/* TAB 3: SAFE HAVENS ("Ask for Angela") */}
-              {/* ============================================================== */}
+              {/* TAB 3: SAFE HAVENS */}
               {activeTab === 'safe-havens' && (
-                <div className="space-y-2.5">
+                <div className="space-y-2">
                   <div>
-                    <span className="text-[10px] font-mono text-rose-600 font-bold uppercase tracking-wider">
-                      Verified 24/7 Sanctuaries
+                    <span className="text-[10px] font-mono text-stone-500 uppercase">
+                      Physical Sanctuaries
                     </span>
-                    <h3 className="text-base font-bold text-stone-900">Safe Haven Radar</h3>
+                    <h3 className="text-sm font-semibold text-stone-900">Safe Haven Radar</h3>
                   </div>
 
-                  {/* Ask for Angela banner */}
-                  <div className="p-2.5 rounded-2xl bg-white border border-rose-200 text-left space-y-1 shadow-sm">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-rose-700">
-                      <Sparkles className="w-3.5 h-3.5 text-rose-500" />
-                      <span>"Ask for Angela" Codeword</span>
+                  <div className="p-2.5 rounded-xl bg-white border border-rose-200/80 text-left space-y-1">
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-stone-900">
+                      <MessageSquare className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Codeword: "Ask for Angela"</span>
                     </div>
-                    <p className="text-[10px] text-stone-600 leading-tight">
-                      Tell staff at any partner store: <em>"Can I speak with Angela?"</em> Staff discreetly escorts you to a locked employee room and calls verified escort police.
+                    <p className="text-[10px] text-stone-600 leading-snug">
+                      Tell staff: <em>"Can I speak with Angela?"</em> Staff discreetly escorts you to a locked employee room and summons verified police support.
                     </p>
                   </div>
 
-                  {/* Nearby Haven List */}
-                  <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                  <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-0.5">
                     {DELHI_NCR_SAFE_HAVENS.slice(0, 4).map((haven) => (
                       <div
                         key={haven.id}
-                        className="p-2.5 rounded-2xl bg-white border border-rose-200 hover:border-rose-400 transition-all flex items-start justify-between gap-2 text-left shadow-sm"
+                        className="p-2.5 rounded-xl bg-white border border-rose-100 hover:border-rose-200 transition-colors flex items-start justify-between gap-2 text-left"
                       >
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[9px] px-1.5 py-0.2 rounded font-mono uppercase bg-rose-50 text-rose-700 border border-rose-200 font-bold">
+                            <span className="text-[9px] px-1 py-0.2 rounded font-mono uppercase bg-rose-50 text-rose-700 border border-rose-200">
                               {haven.categoryLabel}
                             </span>
-                            <span className="text-xs font-bold text-stone-900 truncate max-w-[130px]">
+                            <span className="text-xs font-medium text-stone-900 truncate max-w-[120px]">
                               {haven.name}
                             </span>
                           </div>
-                          <p className="text-[10px] text-stone-500 truncate max-w-[170px]">
+                          <p className="text-[10px] text-stone-500 truncate max-w-[160px]">
                             {haven.address}
                           </p>
-                          <div className="flex items-center gap-2 text-[9px] text-emerald-700 font-semibold">
-                            <span>🛡️ Staff Trained</span>
-                            <span>·</span>
-                            <span>⚡ CCTV Monitored</span>
+                          <div className="text-[9px] text-emerald-700">
+                            <span>Trained staff · CCTV monitored</span>
                           </div>
                         </div>
 
                         <button
-                          onClick={() => alert(`Rerouting to ${haven.name} (${haven.address}). ETA 3 mins.`)}
-                          className="px-2 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-[10px] font-bold flex-shrink-0 flex items-center gap-1 shadow-sm"
+                          onClick={() => alert(`Rerouting to ${haven.name} (${haven.address}). Delta: +2 mins.`)}
+                          className="h-7 px-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-medium flex-shrink-0 flex items-center gap-1 transition-colors cursor-pointer"
                         >
                           <span>Reroute</span>
                           <ChevronRight className="w-3 h-3" />
@@ -484,52 +471,50 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                 </div>
               )}
 
-              {/* ============================================================== */}
-              {/* TAB 4: DETERRENCE & MESH */}
-              {/* ============================================================== */}
+              {/* TAB 4: DETERRENCE */}
               {activeTab === 'deterrence' && (
                 <div className="space-y-3 text-left">
                   <div>
-                    <span className="text-[10px] font-mono text-rose-600 font-bold uppercase tracking-wider">
+                    <span className="text-[10px] font-mono text-stone-500 uppercase">
                       Deterrence Suite
                     </span>
-                    <h3 className="text-base font-bold text-stone-900">Fake Call & Offline Mesh</h3>
+                    <h3 className="text-sm font-semibold text-stone-900">Fake Call & Offline Mesh</h3>
                   </div>
 
-                  {/* FAKE CALL SIMULATOR */}
-                  <div className="p-3 rounded-2xl bg-white border border-rose-200 space-y-2.5 shadow-sm">
+                  {/* Fake Call Generator */}
+                  <div className="p-3 rounded-xl bg-white border border-rose-100 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
-                        <PhoneCall className="w-4 h-4 text-rose-600" />
+                      <span className="text-xs font-medium text-stone-900 flex items-center gap-1.5">
+                        <PhoneCall className="w-3.5 h-3.5 text-stone-500" />
                         Fake Call Generator
                       </span>
-                      <span className="text-[10px] font-mono text-stone-500">Live Simulation</span>
+                      <span className="text-[10px] font-mono text-stone-400">Simulation</span>
                     </div>
 
                     {callState === 'idle' && (
                       <button
                         onClick={() => setCallState('ringing')}
-                        className="w-full py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm"
+                        className="w-full h-8 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <PhoneCall className="w-3.5 h-3.5" />
-                        <span>Trigger Instant Incoming Call</span>
+                        <span>Trigger Incoming Call</span>
                       </button>
                     )}
 
                     {callState === 'ringing' && (
-                      <div className="p-3 rounded-xl bg-stone-900 text-white text-center space-y-2 animate-bounce">
-                        <p className="text-[11px] font-bold text-stone-400">Incoming Call</p>
-                        <p className="text-sm font-black text-white">Dad (Live Location Connected)</p>
-                        <div className="flex items-center justify-center gap-4 pt-1">
+                      <div className="p-3 rounded-xl bg-stone-900 text-white text-center space-y-2">
+                        <p className="text-[10px] text-stone-400">Incoming Call</p>
+                        <p className="text-xs font-medium text-white">Dad (Live Location Connected)</p>
+                        <div className="flex items-center justify-center gap-3 pt-1">
                           <button
                             onClick={() => setCallState('idle')}
-                            className="p-2.5 rounded-full bg-red-600 text-white"
+                            className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center cursor-pointer"
                           >
                             <X className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => setCallState('active')}
-                            className="p-2.5 rounded-full bg-emerald-600 text-white animate-pulse"
+                            className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center cursor-pointer"
                           >
                             <PhoneCall className="w-4 h-4" />
                           </button>
@@ -541,14 +526,14 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                       <div className="p-3 rounded-xl bg-stone-900 text-white text-center space-y-2">
                         <div className="flex items-center justify-between text-xs text-rose-400">
                           <span>Connected</span>
-                          <span className="font-mono">00:{callDuration < 10 ? `0${callDuration}` : callDuration}</span>
+                          <span className="font-mono tabular-nums">00:{callDuration < 10 ? `0${callDuration}` : callDuration}</span>
                         </div>
                         <p className="text-xs italic text-stone-300">
-                          "Hey! I see you turning onto the service road on GPS. I'm right here by the car, hurry up!"
+                          "Hey! I see you turning onto the service road on GPS. I am right outside with the car, hurry up!"
                         </p>
                         <button
                           onClick={() => setCallState('idle')}
-                          className="px-3 py-1 rounded-lg bg-rose-600 text-white text-[10px] font-bold"
+                          className="h-7 px-3 rounded-lg bg-rose-600 text-white text-[10px] font-medium cursor-pointer"
                         >
                           End Call
                         </button>
@@ -556,17 +541,17 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     )}
                   </div>
 
-                  {/* OFFLINE BLE MESH RELAY */}
-                  <div className="p-3 rounded-2xl bg-white border border-rose-200 space-y-2 shadow-sm">
+                  {/* Offline BLE Mesh */}
+                  <div className="p-3 rounded-xl bg-white border border-rose-100 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
-                        <Radio className="w-4 h-4 text-rose-600" />
+                      <span className="text-xs font-medium text-stone-900 flex items-center gap-1.5">
+                        <Radio className="w-3.5 h-3.5 text-stone-500" />
                         Zero-Data BLE Mesh
                       </span>
-                      <span className="text-[10px] font-mono text-emerald-700 font-bold">{meshNodes} Peer Relays</span>
+                      <span className="text-[10px] font-mono text-emerald-700">{meshNodes} Peer Relays</span>
                     </div>
-                    <p className="text-[10px] text-stone-500 leading-tight">
-                      When cellular towers blackout or data is disabled, Safie broadcasts an encrypted BLE packet hopping device-to-device to any phone with internet.
+                    <p className="text-[10px] text-stone-500 leading-snug">
+                      When cellular towers blackout or data is disconnected, Safie broadcasts an encrypted packet hopping device-to-device to any phone with data.
                     </p>
 
                     <button
@@ -574,13 +559,13 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                         setMeshBroadcasting(!meshBroadcasting);
                         if (!meshBroadcasting) setMeshNodes((n) => n + 2);
                       }}
-                      className={`w-full py-2 rounded-xl text-xs font-bold transition-all ${
+                      className={`w-full h-8 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                         meshBroadcasting
-                          ? 'bg-rose-100 text-rose-800 border border-rose-400 animate-pulse'
-                          : 'bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200'
+                          ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                          : 'bg-rose-50/60 hover:bg-rose-100 text-stone-800 border border-rose-200'
                       }`}
                     >
-                      {meshBroadcasting ? '📡 Relaying SOS Mesh Hop...' : 'Test BLE Mesh Hop'}
+                      {meshBroadcasting ? 'Relaying SOS Mesh Hop...' : 'Test BLE Mesh Hop'}
                     </button>
                   </div>
                 </div>
@@ -589,12 +574,12 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
             </div>
 
             {/* BOTTOM PHONE NAVIGATION TABS */}
-            <div className="h-16 bg-white border-t border-rose-200 px-3 flex items-center justify-around z-30 select-none">
+            <div className="h-14 bg-white border-t border-rose-100 px-3 flex items-center justify-around z-30 select-none">
               
               <button
                 onClick={() => setActiveTab('safety-hold')}
-                className={`flex flex-col items-center gap-0.5 text-[10px] font-bold transition-all ${
-                  activeTab === 'safety-hold' ? 'text-rose-600 scale-105' : 'text-stone-400 hover:text-stone-600'
+                className={`flex flex-col items-center gap-0.5 text-[10px] transition-colors cursor-pointer ${
+                  activeTab === 'safety-hold' ? 'text-rose-600 font-medium' : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
                 <ShieldAlert className="w-4 h-4" />
@@ -603,8 +588,8 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
 
               <button
                 onClick={() => setActiveTab('navigation')}
-                className={`flex flex-col items-center gap-0.5 text-[10px] font-bold transition-all ${
-                  activeTab === 'navigation' ? 'text-rose-600 scale-105' : 'text-stone-400 hover:text-stone-600'
+                className={`flex flex-col items-center gap-0.5 text-[10px] transition-colors cursor-pointer ${
+                  activeTab === 'navigation' ? 'text-rose-600 font-medium' : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
                 <Navigation className="w-4 h-4" />
@@ -613,8 +598,8 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
 
               <button
                 onClick={() => setActiveTab('safe-havens')}
-                className={`flex flex-col items-center gap-0.5 text-[10px] font-bold transition-all ${
-                  activeTab === 'safe-havens' ? 'text-rose-600 scale-105' : 'text-stone-400 hover:text-stone-600'
+                className={`flex flex-col items-center gap-0.5 text-[10px] transition-colors cursor-pointer ${
+                  activeTab === 'safe-havens' ? 'text-rose-600 font-medium' : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
                 <Building className="w-4 h-4" />
@@ -623,8 +608,8 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
 
               <button
                 onClick={() => setActiveTab('deterrence')}
-                className={`flex flex-col items-center gap-0.5 text-[10px] font-bold transition-all ${
-                  activeTab === 'deterrence' ? 'text-rose-600 scale-105' : 'text-stone-400 hover:text-stone-600'
+                className={`flex flex-col items-center gap-0.5 text-[10px] transition-colors cursor-pointer ${
+                  activeTab === 'deterrence' ? 'text-rose-600 font-medium' : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
                 <Radio className="w-4 h-4" />
@@ -634,8 +619,8 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
             </div>
 
             {/* Home Bar Indicator */}
-            <div className="h-3 bg-white flex justify-center pb-1">
-              <div className="w-28 h-1 rounded-full bg-stone-300" />
+            <div className="h-2.5 bg-white flex justify-center pb-1">
+              <div className="w-24 h-1 rounded-full bg-stone-300" />
             </div>
 
           </div>
@@ -644,41 +629,41 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
         {/* ============================================================== */}
         {/* COMPANION INSTRUCTIONS & CONTROLS */}
         {/* ============================================================== */}
-        <div className="max-w-md w-full text-left space-y-4 p-5 sm:p-6 rounded-3xl bg-white border border-rose-200 shadow-xl">
+        <div className="max-w-md w-full text-left space-y-4 p-5 sm:p-6 rounded-2xl bg-white border border-rose-200/80 shadow-md">
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-full text-xs font-mono uppercase font-bold bg-rose-100 text-rose-700 border border-rose-300">
-              Interactive Simulation
+            <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-rose-50 text-rose-700 border border-rose-200 font-medium">
+              Simulation Sandbox
             </span>
-            <span className="text-xs text-stone-500 font-mono">Live Sandbox</span>
+            <span className="text-[11px] text-stone-400 font-mono">Live in-browser</span>
           </div>
 
-          <h2 className="text-2xl font-black tracking-tight text-stone-900">
-            Test Safie Mobile Features Live in Browser
+          <h2 className="text-xl font-semibold tracking-tight text-stone-900">
+            Interactive mobile application simulator
           </h2>
 
-          <p className="text-sm text-stone-600 leading-relaxed">
-            This interactive simulator reproduces the real Kotlin Android app logic directly inside your browser. Try these live interactions:
+          <p className="text-xs text-stone-600 leading-relaxed font-normal">
+            This simulator reproduces the core Kotlin Android application logic in your browser. Test these real-world flows:
           </p>
 
-          <div className="space-y-3 text-xs">
-            <div className="p-3 rounded-2xl bg-rose-50/70 border border-rose-200/80 space-y-1">
-              <strong className="text-rose-700 block font-bold">1. Hold & Release Dead Man's Switch:</strong>
+          <div className="space-y-2.5 text-xs">
+            <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100 space-y-1">
+              <strong className="text-stone-900 block font-medium">1. Hold & Release Dead Man's Switch:</strong>
               <p className="text-stone-600">
-                Hold down the tactile pink button, then release it to watch the 10-second emergency countdown trigger.
+                Hold the rose button with your mouse/touch, then release it to watch the 10-second emergency countdown trigger.
               </p>
             </div>
 
-            <div className="p-3 rounded-2xl bg-rose-50/70 border border-rose-200/80 space-y-1">
-              <strong className="text-rose-700 block font-bold">2. Test Duress PIN (9876):</strong>
+            <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100 space-y-1">
+              <strong className="text-stone-900 block font-medium">2. Test Duress PIN (9876):</strong>
               <p className="text-stone-600">
-                Type <code className="text-rose-700 font-mono font-bold bg-white px-1.5 py-0.5 rounded border border-rose-200">9876</code> to see how Safie deceives an aggressor by displaying "Alarm Cancelled" while covertly transmitting high-priority red alert with live GPS to Delhi Police!
+                Type <code className="text-rose-700 font-mono px-1 py-0.5 rounded bg-white border border-rose-200">9876</code> to see how Safie deceives an aggressor by displaying "Alarm Cancelled" while covertly transmitting a high-priority red alert to Delhi Police.
               </p>
             </div>
 
-            <div className="p-3 rounded-2xl bg-rose-50/70 border border-rose-200/80 space-y-1">
-              <strong className="text-rose-700 block font-bold">3. Safe Haven "Ask for Angela":</strong>
+            <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100 space-y-1">
+              <strong className="text-stone-900 block font-medium">3. Safe Haven "Ask for Angela":</strong>
               <p className="text-stone-600">
-                Switch to <strong>Havens</strong> to view real 24/7 verified pharmacies and metro police desks across Gurugram & South Delhi with 1-tap detour routing.
+                Switch to <strong>Havens</strong> to inspect real 24/7 verified pharmacies and metro police desks across Gurugram and South Delhi with 1-tap detour routing.
               </p>
             </div>
           </div>
@@ -686,13 +671,13 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
           {/* Quick Action to Download Android APK */}
           <div className="pt-2 flex items-center justify-between border-t border-rose-100">
             <div>
-              <p className="text-xs font-bold text-stone-900">Ready for Real Device?</p>
-              <p className="text-[11px] text-stone-500">Download native Kotlin APK</p>
+              <p className="text-xs font-medium text-stone-900">Physical Android Device?</p>
+              <p className="text-[11px] text-stone-500">Sideload release APK</p>
             </div>
             <a
               href="/downloads/safie-release.apk"
               download="Safie-v1.0-delhi-ncr.apk"
-              className="px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+              className="h-8 px-3.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs transition-colors flex items-center gap-1.5"
             >
               <span>Download APK</span>
               <ArrowRight className="w-3.5 h-3.5" />
