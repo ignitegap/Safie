@@ -25,8 +25,10 @@ import {
   Wifi,
   Battery,
   MessageSquare,
+  Play,
+  Square,
 } from 'lucide-react';
-import { DELHI_NCR_SAFE_HAVENS } from '@/lib/data-delhi-ncr';
+import { DELHI_NCR_SAFE_HAVENS, SafeHaven } from '@/lib/data-delhi-ncr';
 
 interface PhoneMockupDemoProps {
   isOpen: boolean;
@@ -41,6 +43,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
   // Navigation State
   const [selectedRoute, setSelectedRoute] = useState<'safest' | 'fastest'>('safest');
   const [isNavigating, setIsNavigating] = useState(false);
+  const [navStepIndex, setNavStepIndex] = useState(0);
 
   // Safety Hold State
   const [isHolding, setIsHolding] = useState(false);
@@ -58,9 +61,19 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
   // Mesh State
   const [meshNodes, setMeshNodes] = useState(7);
   const [meshBroadcasting, setMeshBroadcasting] = useState(false);
+  const [meshLogs, setMeshLogs] = useState<string[]>([]);
 
   // Clock
   const [timeStr, setTimeStr] = useState('23:42');
+
+  const navigationSteps = [
+    { text: 'Start at DLF Cyber City Rapid Metro', distance: '100m' },
+    { text: 'Turn right onto DLF Phase 2 Illuminated Corridor', distance: '350m' },
+    { text: 'Passing 24/7 Apollo Pharmacy Sanctuary on your left', distance: '400m' },
+    { text: 'Continue straight along MG Road Main Arterial', distance: '1.2 km' },
+    { text: 'Turn left toward Sector 29 Leisure Valley Corridor', distance: '800m' },
+    { text: 'Arrive safely at Sector 29 Market', distance: 'Destination' },
+  ];
 
   useEffect(() => {
     const updateTime = () => {
@@ -74,6 +87,19 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
     return () => clearInterval(interval);
   }, []);
 
+  // Step advancement during active navigation
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isNavigating) {
+      interval = setInterval(() => {
+        setNavStepIndex((prev) => (prev + 1) % navigationSteps.length);
+      }, 4000);
+    } else {
+      setNavStepIndex(0);
+    }
+    return () => clearInterval(interval);
+  }, [isNavigating]);
+
   // Safety Hold countdown timer
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -85,21 +111,38 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
       // Countdown expired: Auto-trigger Level 3 SOS
       setPinFeedback({
         status: 'duress',
-        message: '10s Window Expired: Emergency SOS packet dispatched with live GPS to Police Control Room and registered contacts.',
+        message: '10s Window Expired: Emergency SOS packet dispatched with live GPS to Police Control Room (112) & registered emergency contacts.',
       });
     }
     return () => clearTimeout(timer);
   }, [countdown]);
 
-  // Fake Call active timer
+  // Fake Call active timer and speech deterrence
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (callState === 'active') {
       timer = setInterval(() => {
         setCallDuration((prev) => prev + 1);
       }, 1000);
+
+      // Play real audio voice deterrence through speech synthesis if available
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        try {
+          const utterance = new SpeechSynthesisUtterance(
+            "Hey! I can see your location on the map, I'm right outside waiting with the car, hurry up!"
+          );
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          window.speechSynthesis.speak(utterance);
+        } catch (e) {
+          console.warn('Speech synthesis error', e);
+        }
+      }
     } else {
       setCallDuration(0);
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
     }
     return () => clearInterval(timer);
   }, [callState]);
@@ -134,7 +177,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
       setCountdown(null);
       setPinFeedback({
         status: 'duress',
-        message: 'Alarm Cancelled. (Deceptive confirmation displayed. High-priority covert alert dispatched to Police & emergency contacts with live GPS coordinates)',
+        message: 'Alarm Cancelled. (Deceptive display confirmed. Covert red alert dispatched with live GPS coordinates: 28.4958° N, 77.0895° E to Gurugram Police 112 & family)',
       });
       setPinInput('');
     } else {
@@ -143,6 +186,22 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
         message: 'Incorrect PIN. Try 1234 (Normal Disarm) or 9876 (Duress PIN).',
       });
     }
+  };
+
+  const triggerMeshRelay = () => {
+    setMeshBroadcasting(true);
+    setMeshLogs(['Broadcasting encrypted SOS packet via BLE...']);
+    setTimeout(() => {
+      setMeshLogs((prev) => [...prev, 'Node 1 (Galaxy S23, 12m away) relayed packet']);
+    }, 800);
+    setTimeout(() => {
+      setMeshLogs((prev) => [...prev, 'Node 2 (iPhone 14, 45m away) forwarded to 5G Cell']);
+      setMeshNodes((n) => n + 2);
+    }, 1600);
+    setTimeout(() => {
+      setMeshLogs((prev) => [...prev, 'SOS Delivered to 112 Gateway over zero mobile data']);
+      setMeshBroadcasting(false);
+    }, 2400);
   };
 
   if (!isOpen) return null;
@@ -167,7 +226,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
         {/* ============================================================== */}
         <div className="relative w-[340px] sm:w-[360px] h-[690px] rounded-[48px] p-3 bg-stone-900 border-[3px] border-stone-800 shadow-2xl flex-shrink-0 select-none">
           
-          {/* Side Buttons */}
+          {/* Side Hardware Buttons */}
           <div className="absolute -left-[5px] top-28 w-[2px] h-10 bg-stone-700 rounded-l-sm" />
           <div className="absolute -left-[5px] top-42 w-[2px] h-12 bg-stone-700 rounded-l-sm" />
           <div className="absolute -right-[5px] top-32 w-[2px] h-16 bg-stone-700 rounded-r-sm" />
@@ -256,39 +315,24 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </button>
                   </div>
 
-                  {/* Simulated Mini Map Visual */}
-                  <div className="h-40 rounded-xl overflow-hidden bg-rose-50 border border-rose-100 p-2.5 flex flex-col justify-between">
-                    <div className="space-y-1 text-xs">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-rose-600" />
-                        <span className="font-medium text-stone-800">Cyber City Rapid Metro</span>
-                      </div>
-                      
-                      <div className="ml-1 pl-2.5 border-l border-rose-300 py-1 space-y-1">
-                        <div className="flex items-center gap-1 text-[10px] text-rose-700">
-                          <Building className="w-3 h-3" />
-                          <span>Apollo Pharmacy (Refuge)</span>
-                        </div>
-                        <div className="text-[10px] text-stone-500">
-                          Via DLF Phase 2 Lit Corridor
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-600" />
-                        <span className="font-medium text-stone-800">Sector 29 Leisure Valley</span>
-                      </div>
+                  {/* Live Escort Navigation Feed */}
+                  <div className="p-3 rounded-xl bg-white border border-rose-100 space-y-2">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-semibold text-stone-900 flex items-center gap-1.5">
+                        <Navigation className="w-3.5 h-3.5 text-rose-600" />
+                        <span>Live Escort Step</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-stone-400">
+                        Step {navStepIndex + 1}/{navigationSteps.length}
+                      </span>
                     </div>
 
-                    <div className="p-1.5 rounded-lg bg-white border border-rose-100 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5">
-                        <Shield className="w-3.5 h-3.5 text-rose-600" />
-                        <span className="text-[10px] font-medium text-stone-800">
-                          Active Safe Corridor
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-mono text-emerald-700">
-                        Score 94/100
+                    <div className="p-2.5 rounded-lg bg-rose-50/50 border border-rose-100 text-xs">
+                      <p className="font-medium text-stone-900">
+                        {navigationSteps[navStepIndex].text}
+                      </p>
+                      <span className="text-[10px] text-rose-600 font-mono block mt-0.5">
+                        Distance remaining: {navigationSteps[navStepIndex].distance}
                       </span>
                     </div>
                   </div>
@@ -302,8 +346,8 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                         : 'bg-rose-600 hover:bg-rose-700 text-white'
                     }`}
                   >
-                    <Navigation className="w-3.5 h-3.5" />
-                    <span>{isNavigating ? 'End Escort Guidance' : 'Start Escort Guidance'}</span>
+                    {isNavigating ? <Square className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                    <span>{isNavigating ? 'Stop Escort Walk' : 'Start Live Escort Walk'}</span>
                   </button>
                 </div>
               )}
@@ -431,12 +475,12 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                       <span>Codeword: "Ask for Angela"</span>
                     </div>
                     <p className="text-[10px] text-stone-600 leading-snug">
-                      Tell staff: <em>"Can I speak with Angela?"</em> Staff discreetly escorts you to a locked employee room and summons verified police support.
+                      Tell staff: <em>"Can I speak with Angela?"</em> Staff discreetly escorts you to a locked employee room and summons police backup.
                     </p>
                   </div>
 
                   <div className="space-y-1.5 max-h-[300px] overflow-y-auto pr-0.5">
-                    {DELHI_NCR_SAFE_HAVENS.slice(0, 4).map((haven) => (
+                    {DELHI_NCR_SAFE_HAVENS.slice(0, 5).map((haven) => (
                       <div
                         key={haven.id}
                         className="p-2.5 rounded-xl bg-white border border-rose-100 hover:border-rose-200 transition-colors flex items-start justify-between gap-2 text-left"
@@ -459,7 +503,10 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                         </div>
 
                         <button
-                          onClick={() => alert(`Rerouting to ${haven.name} (${haven.address}). Delta: +2 mins.`)}
+                          onClick={() => {
+                            setActiveTab('navigation');
+                            setIsNavigating(true);
+                          }}
                           className="h-7 px-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-medium flex-shrink-0 flex items-center gap-1 transition-colors cursor-pointer"
                         >
                           <span>Reroute</span>
@@ -481,14 +528,14 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     <h3 className="text-sm font-semibold text-stone-900">Fake Call & Offline Mesh</h3>
                   </div>
 
-                  {/* Fake Call Generator */}
+                  {/* Fake Call Generator with Real Speech Synthesis */}
                   <div className="p-3 rounded-xl bg-white border border-rose-100 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-stone-900 flex items-center gap-1.5">
                         <PhoneCall className="w-3.5 h-3.5 text-stone-500" />
-                        Fake Call Generator
+                        Fake Call Audio Deterrent
                       </span>
-                      <span className="text-[10px] font-mono text-stone-400">Simulation</span>
+                      <span className="text-[10px] font-mono text-stone-400">Speech Audio</span>
                     </div>
 
                     {callState === 'idle' && (
@@ -525,11 +572,11 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     {callState === 'active' && (
                       <div className="p-3 rounded-xl bg-stone-900 text-white text-center space-y-2">
                         <div className="flex items-center justify-between text-xs text-rose-400">
-                          <span>Connected</span>
+                          <span>Speaking via Device Speaker...</span>
                           <span className="font-mono tabular-nums">00:{callDuration < 10 ? `0${callDuration}` : callDuration}</span>
                         </div>
                         <p className="text-xs italic text-stone-300">
-                          "Hey! I see you turning onto the service road on GPS. I am right outside with the car, hurry up!"
+                          "Hey! I can see your location on the map, I'm right outside waiting with the car, hurry up!"
                         </p>
                         <button
                           onClick={() => setCallState('idle')}
@@ -555,10 +602,8 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </p>
 
                     <button
-                      onClick={() => {
-                        setMeshBroadcasting(!meshBroadcasting);
-                        if (!meshBroadcasting) setMeshNodes((n) => n + 2);
-                      }}
+                      onClick={triggerMeshRelay}
+                      disabled={meshBroadcasting}
                       className={`w-full h-8 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
                         meshBroadcasting
                           ? 'bg-rose-100 text-rose-800 border border-rose-300'
@@ -567,6 +612,17 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     >
                       {meshBroadcasting ? 'Relaying SOS Mesh Hop...' : 'Test BLE Mesh Hop'}
                     </button>
+
+                    {meshLogs.length > 0 && (
+                      <div className="p-2 rounded-lg bg-stone-900 text-stone-300 font-mono text-[10px] space-y-1">
+                        {meshLogs.map((log, lIdx) => (
+                          <div key={lIdx} className="flex items-center gap-1.5">
+                            <span className="text-emerald-400">➔</span>
+                            <span>{log}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -661,7 +717,14 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
             </div>
 
             <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100 space-y-1">
-              <strong className="text-stone-900 block font-medium">3. Safe Haven "Ask for Angela":</strong>
+              <strong className="text-stone-900 block font-medium">3. Audio Fake Call Deterrent:</strong>
+              <p className="text-stone-600">
+                Under <strong>Deterrence</strong>, click "Trigger Incoming Call" and accept it to hear real spoken reassurance through your device speaker.
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100 space-y-1">
+              <strong className="text-stone-900 block font-medium">4. Safe Haven "Ask for Angela":</strong>
               <p className="text-stone-600">
                 Switch to <strong>Havens</strong> to inspect real 24/7 verified pharmacies and metro police desks across Gurugram and South Delhi with 1-tap detour routing.
               </p>
