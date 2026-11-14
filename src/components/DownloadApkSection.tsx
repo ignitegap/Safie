@@ -11,7 +11,7 @@ import {
 
 export default function DownloadApkSection() {
   const [copied, setCopied] = useState(false);
-  const checksum = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+  const checksum = '2cf5f54c77d62fe327292c9c5473414bad9ca5b177ec6143e0726d5739e0cc47';
 
   const copyChecksum = () => {
     navigator.clipboard.writeText(checksum);
@@ -56,19 +56,28 @@ export default function DownloadApkSection() {
               </div>
             </div>
 
-            {/* Direct Download Button */}
-            <div className="pt-2 flex flex-wrap items-center gap-4">
+            {/* Direct Download Button & GitHub Mirror */}
+            <div className="pt-2 flex flex-wrap items-center gap-3">
               <a
-                href="/downloads/safie-release.apk"
+                href="/downloads/safie-v1.0.0-delhi-ncr.apk"
                 download="Safie-v1.0-delhi-ncr.apk"
-                className="h-11 px-6 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-sm transition-colors flex items-center gap-2.5 cursor-pointer"
+                className="h-11 px-5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-medium text-sm transition-colors flex items-center gap-2.5 cursor-pointer shadow-sm"
               >
                 <Download className="w-4 h-4" />
-                <span>Download APK (24 MB)</span>
+                <span>Direct Download APK (7.9 MB)</span>
+              </a>
+
+              <a
+                href="https://github.com/ignitegap/Safie/releases/tag/v1.0.0-delhi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="h-11 px-4 rounded-lg bg-white border border-rose-200 hover:bg-rose-50 text-stone-700 font-medium text-sm transition-colors flex items-center gap-2 cursor-pointer"
+              >
+                <span>GitHub Release Mirror</span>
               </a>
               
-              <div className="text-xs text-stone-500">
-                <span className="text-emerald-700 font-medium block">Verified clean package</span>
+              <div className="text-xs text-stone-500 w-full sm:w-auto">
+                <span className="text-emerald-700 font-medium block">Verified native Kotlin build</span>
                 <span>Stand-alone offline bundle</span>
               </div>
             </div>

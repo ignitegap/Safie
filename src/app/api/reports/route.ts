@@ -51,3 +51,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message || 'Failed to submit report' }, { status: 500 });
   }
 }
+
