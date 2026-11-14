@@ -43,6 +43,7 @@ if (DATABASE_URL && !DATABASE_URL.includes('YOUR_NEON_PASSWORD') && !DATABASE_UR
 
 export async function query(text: string, params?: any[]) {
   if (pool) {
+    await ensureTables();
     return pool.query(text, params);
   }
   // Local in-memory mock fallback if pool is absent
@@ -88,6 +89,30 @@ async function ensureTables() {
         duress_invoked BOOLEAN DEFAULT FALSE,
         status VARCHAR(30) DEFAULT 'active',
         tracking_token VARCHAR(64) NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS community_reports (
+        id VARCHAR(64) PRIMARY KEY,
+        user_id VARCHAR(64),
+        category VARCHAR(50) NOT NULL,
+        lat DECIMAL(10, 6) NOT NULL,
+        lng DECIMAL(10, 6) NOT NULL,
+        address TEXT,
+        description TEXT NOT NULL,
+        status VARCHAR(30) DEFAULT 'submitted',
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+
+      CREATE TABLE IF NOT EXISTS route_feedback (
+        id VARCHAR(64) PRIMARY KEY,
+        user_id VARCHAR(64),
+        route_id VARCHAR(64),
+        origin TEXT,
+        destination TEXT,
+        perceived_safety_rating INT NOT NULL,
+        actual_lighting_rating INT NOT NULL,
+        comments TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
     `);
