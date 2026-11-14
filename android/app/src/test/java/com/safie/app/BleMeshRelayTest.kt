@@ -82,3 +82,4 @@ class BleMeshRelayTest {
         assertTrue("Node with internet must bridge BLE mesh packet to cloud uplink", uplinkCalled)
     }
 }
+

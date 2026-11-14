@@ -116,3 +116,4 @@ export default function TopHeader({ onOpenDemo, onOpenAuth, user, onLogout }: To
     </header>
   );
 }
+

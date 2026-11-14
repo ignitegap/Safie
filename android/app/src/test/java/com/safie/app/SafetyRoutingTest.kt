@@ -63,3 +63,4 @@ class SafetyRoutingTest {
         assertEquals(22, route.lightingAverage)
     }
 }
+

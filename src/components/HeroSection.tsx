@@ -146,3 +146,4 @@ export default function HeroSection({ onOpenDemo, onOpenAuth }: HeroSectionProps
     </section>
   );
 }
+

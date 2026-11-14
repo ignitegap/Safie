@@ -163,3 +163,4 @@ export default function ThreatEscalationSection({ onOpenDemo }: ThreatEscalation
     </section>
   );
 }
+

@@ -23,3 +23,4 @@ enum class HavenCategory {
     PETROL_STATION,
     COMMERCIAL_RETAIL
 }
+

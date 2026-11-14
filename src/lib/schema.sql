@@ -72,3 +72,4 @@ CREATE INDEX IF NOT EXISTS idx_users_phone ON users(phone);
 CREATE INDEX IF NOT EXISTS idx_safe_havens_coords ON safe_havens(lat, lng);
 CREATE INDEX IF NOT EXISTS idx_road_segments_zone ON road_segments(zone);
 CREATE INDEX IF NOT EXISTS idx_sos_events_status ON sos_events(status);
+

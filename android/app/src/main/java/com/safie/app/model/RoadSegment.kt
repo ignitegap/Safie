@@ -13,3 +13,4 @@ data class RoadSegment(
     val hasContinuousSidewalk: Boolean,
     val safetyScore: Int // 0 - 100
 )
+

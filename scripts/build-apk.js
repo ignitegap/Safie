@@ -108,3 +108,4 @@ createZipFile(path.join(__dirname, '..', 'public', 'downloads', 'safie-release.a
   { name: 'resources.arsc', data: 'SAFIE_RES_DELHI_GURUGRAM_CCMS' },
   { name: 'META-INF/MANIFEST.MF', data: 'Manifest-Version: 1.0\r\nCreated-By: Safie Kotlin Compiler 1.9.22\r\nPackage: com.safie.app\r\n' }
 ]);
+

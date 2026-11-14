@@ -1,0 +1,52 @@
+{
+  "users": [
+    {
+      "id": "usr-demo-001",
+      "phone": "+919810012345",
+      "name": "Priya Sharma (Demo Citizen)",
+      "passwordHash": "$2a$10$yC40b89/ZbKx8y3pVgLfj.0MO9aL7.goTkhmnOaoUMRWtI9srnTuu",
+      "emergencyContacts": [
+        {
+          "name": "Papa",
+          "phone": "+91-9811001122",
+          "relation": "Father"
+        },
+        {
+          "name": "Pooja (Roommate)",
+          "phone": "+91-9877003344",
+          "relation": "Friend"
+        }
+      ],
+      "duressPin": "9876",
+      "createdAt": "2026-11-14T10:00:00.000Z"
+    },
+    {
+      "phone": "+919999888877",
+      "name": "Aarav Mehta",
+      "passwordHash": "$2a$10$DfYWN36/SUWd4Ivu.Jaqu.1w5mfu6xgRCutkB0KSfS2d0w7nEqmZ.",
+      "emergencyContacts": [
+        {
+          "name": "Mom",
+          "phone": "+919876543210",
+          "relation": "Mother"
+        }
+      ],
+      "duressPin": "9876",
+      "id": "usr-1794651761346",
+      "createdAt": "2026-11-14T10:22:41.346Z"
+    }
+  ],
+  "sosEvents": [
+    {
+      "phone": "+919810012345",
+      "lat": 28.4958,
+      "lng": 77.0895,
+      "tier": 2,
+      "duressInvoked": true,
+      "status": "active",
+      "trackingToken": "sqot7bm6on",
+      "id": "sos-1794651786327",
+      "timestamp": "2026-11-14T10:23:06.327Z"
+    }
+  ]
+}

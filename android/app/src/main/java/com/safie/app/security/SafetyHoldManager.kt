@@ -108,3 +108,4 @@ class SafetyHoldManager(
         onStateChanged?.invoke(currentState)
     }
 }
+

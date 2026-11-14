@@ -241,3 +241,4 @@ export default function LeftCurvedNavbar({ onOpenDemo, onOpenAuth, user }: LeftC
     </>
   );
 }
+

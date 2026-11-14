@@ -173,3 +173,4 @@ assert(safeRoute.walkingMinutes - darkShortcut.walkingMinutes <= 7.0, 'Safety de
 console.log('\n=================================================================');
 console.log(`🎉 TEST SUMMARY: ${passedTests} / ${totalTests} TESTS PASSED (100% SUCCESS)`);
 console.log('=================================================================\n');
+

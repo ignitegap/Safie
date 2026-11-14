@@ -99,3 +99,4 @@ class SafetyHoldTest {
         assertFalse("Expiration SOS is overt, not covert", isCovertAlert)
     }
 }
+
