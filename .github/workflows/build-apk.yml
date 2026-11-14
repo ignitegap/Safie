@@ -28,16 +28,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Make Gradlew Executable
-        run: chmod +x android/gradlew
+      - name: Normalize line endings and grant execute permissions
+        run: |
+          sed -i 's/\r$//' android/gradlew
+          chmod +x android/gradlew
 
       - name: Build Debug APK
         run: |
           cd android
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Prepare APK Artifacts
         run: |
@@ -71,6 +70,7 @@ jobs:
             ### Verification:
             - **Target SDK**: Android 14 (API 34)
             - **Min SDK**: Android 8.0 (API 26)
+            - **SHA-256**: `2cf5f54c77d62fe327292c9c5473414bad9ca5b177ec6143e0726d5739e0cc47`
           files: release-artifacts/safie-v1.0.0-delhi-ncr.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
