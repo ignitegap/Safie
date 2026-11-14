@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Safie · Preemptive Urban Safety Platform',
     description:
-      'Google Maps routes for speed. Safie routes for your life. Powered by GMDA CCMS smart streetlights and vetted 24/7 safe havens in Delhi-NCR.',
+      'Google Maps routes for speed. Safie routes for your peace of mind. Powered by GMDA CCMS smart streetlights and vetted 24/7 safe havens in Delhi-NCR.',
     images: ['/logo.png'],
   },
 };
@@ -37,8 +37,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark scroll-smooth">
-      <body className="bg-[#0B0F19] text-[#F8FAFC] antialiased min-h-screen selection:bg-[#E53935] selection:text-white">
+    <html lang="en" className="scroll-smooth">
+      <body className="bg-[#FFF5F6] text-[#1C1917] antialiased min-h-screen selection:bg-[#E11D48] selection:text-white">
         {children}
       </body>
     </html>

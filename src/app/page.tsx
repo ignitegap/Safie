@@ -13,11 +13,8 @@ import {
   Download,
   Github,
   PhoneCall,
-  Sparkles,
-  ExternalLink,
   Radio,
   Cpu,
-  Lock,
 } from 'lucide-react';
 
 import TopHeader from '@/components/TopHeader';
@@ -36,7 +33,6 @@ export default function Home() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
 
-  // Restore authenticated session from localStorage
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem('safie_user');
@@ -55,7 +51,7 @@ export default function Home() {
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0B0F19] text-[#F8FAFC] selection:bg-safie-crimson selection:text-white">
+    <div className="relative min-h-screen bg-[#FFF5F6] text-stone-900 selection:bg-rose-500 selection:text-white">
       
       {/* Top Header Navigation Bar with DEMO TAB */}
       <TopHeader
@@ -96,14 +92,14 @@ export default function Home() {
         {/* 6. System Architecture & Neon Cloud Section */}
         <section id="architecture" className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/60 border border-blue-500/40 text-blue-400 text-xs font-mono font-bold tracking-wider uppercase">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 border border-rose-300 text-rose-700 text-xs font-mono font-bold tracking-wider uppercase">
               <Database className="w-3.5 h-3.5" />
-              <span>Full-Stack Cloud Architecture</span>
+              <span>Full-Stack Cloud Infrastructure</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+            <h2 className="text-3xl sm:text-4xl font-black text-stone-900 tracking-tight">
               Production Stack Powered by Neon PostgreSQL
             </h2>
-            <p className="text-base text-gray-400">
+            <p className="text-base text-stone-600">
               Built to withstand real-world city infrastructure constraints: sub-100ms response times, serverless connection pooling, and multi-region fault tolerance.
             </p>
           </div>
@@ -111,59 +107,59 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Card 1: Neon Cloud DB */}
-            <div className="p-6 rounded-3xl bg-slate-900/80 border border-white/10 backdrop-blur-xl space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+            <div className="p-6 rounded-3xl bg-white border border-rose-200 shadow-sm space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600">
                 <Database className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase">
+                <span className="text-[10px] font-mono text-rose-600 font-bold uppercase">
                   Serverless Database
                 </span>
-                <h3 className="text-lg font-black text-white">Neon PostgreSQL</h3>
+                <h3 className="text-lg font-black text-stone-900">Neon PostgreSQL</h3>
               </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
-                Integrated directly with project <code className="text-emerald-300 font-mono">noisy-shadow-23252383</code>. Stores citizen emergency contacts, hashed credentials (Argon2id/Bcrypt), Safe Haven spatial geometries, and real-time SOS telemetry.
+              <p className="text-xs text-stone-600 leading-relaxed">
+                Stores citizen emergency contacts, hashed credentials (Bcrypt), Safe Haven spatial geometries, and real-time SOS telemetry.
               </p>
-              <div className="pt-2 text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
+              <div className="pt-2 text-[11px] font-mono text-emerald-700 font-semibold flex items-center gap-1.5">
                 <span>⚡ Connection Pooling · 0ms Cold Starts</span>
               </div>
             </div>
 
             {/* Card 2: Routing Engine */}
-            <div className="p-6 rounded-3xl bg-slate-900/80 border border-white/10 backdrop-blur-xl space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-amber-950/80 border border-amber-500/40 flex items-center justify-center text-amber-400">
+            <div className="p-6 rounded-3xl bg-white border border-rose-200 shadow-sm space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600">
                 <Cpu className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-[10px] font-mono text-amber-400 font-bold uppercase">
+                <span className="text-[10px] font-mono text-rose-600 font-bold uppercase">
                   Valhalla Pedestrian Engine
                 </span>
-                <h3 className="text-lg font-black text-white">Multi-Objective Costing</h3>
+                <h3 className="text-lg font-black text-stone-900">Multi-Objective Costing</h3>
               </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
+              <p className="text-xs text-stone-600 leading-relaxed">
                 Applies custom cost penalties to unlit segments and secluded alleys, while factoring in proximity to 24/7 guarded locations. Maximum permitted route detour delta capped at +3 minutes.
               </p>
-              <div className="pt-2 text-[11px] font-mono text-amber-400 flex items-center gap-1.5">
-                <span>🛣️ GMDA CCMS Telemetry Ingestion</span>
+              <div className="pt-2 text-[11px] font-mono text-stone-500 font-semibold flex items-center gap-1.5">
+                <span>GMDA CCMS Telemetry Ingestion</span>
               </div>
             </div>
 
             {/* Card 3: BLE Mesh Relay */}
-            <div className="p-6 rounded-3xl bg-slate-900/80 border border-white/10 backdrop-blur-xl space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-safie-crimson/20 border border-safie-crimson/40 flex items-center justify-center text-safie-crimson">
+            <div className="p-6 rounded-3xl bg-white border border-rose-200 shadow-sm space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600">
                 <Radio className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-[10px] font-mono text-safie-crimson font-bold uppercase">
+                <span className="text-[10px] font-mono text-rose-600 font-bold uppercase">
                   Offline Fallback
                 </span>
-                <h3 className="text-lg font-black text-white">BLE Mesh Relay Engine</h3>
+                <h3 className="text-lg font-black text-stone-900">BLE Mesh Relay Engine</h3>
               </div>
-              <p className="text-xs text-gray-300 leading-relaxed">
+              <p className="text-xs text-stone-600 leading-relaxed">
                 Native Android Kotlin service implementing multi-hop Bluetooth Low Energy flooding. When phone towers are disconnected, SOS packets hop device-to-device to any phone with data connectivity.
               </p>
-              <div className="pt-2 text-[11px] font-mono text-safie-crimson flex items-center gap-1.5">
-                <span>📡 Zero-Data Crisis Transmission</span>
+              <div className="pt-2 text-[11px] font-mono text-rose-600 font-semibold flex items-center gap-1.5">
+                <span>Zero-Data Emergency Hop</span>
               </div>
             </div>
 
@@ -174,16 +170,16 @@ export default function Home() {
         <DownloadApkSection />
 
         {/* 8. Footer */}
-        <footer className="border-t border-white/10 bg-slate-950/80 py-12 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-gray-400">
+        <footer className="border-t border-rose-200/80 bg-white py-12 px-4 sm:px-6 lg:px-8 mt-12">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-stone-500">
             
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-safie-crimson/20 border border-safie-crimson/40 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-xl bg-rose-100 border border-rose-300 flex items-center justify-center">
                 <Image src="/logo.png" alt="Safie" width={24} height={24} />
               </div>
               <div>
-                <span className="font-extrabold text-white text-sm tracking-wider">SAFIE</span>
-                <p className="text-[10px] text-gray-500">
+                <span className="font-extrabold text-stone-900 text-sm tracking-tight">safie</span>
+                <p className="text-[10px] text-stone-400">
                   Preemptive Urban Safety Platform · Delhi NCR Edition
                 </p>
               </div>
@@ -191,25 +187,25 @@ export default function Home() {
 
             {/* Emergency Hotline Badges */}
             <div className="flex flex-wrap items-center justify-center gap-3">
-              <span className="text-[11px] font-semibold text-gray-300">Emergency Hotlines:</span>
-              <span className="px-2.5 py-1 rounded-full bg-red-950/60 border border-red-800 text-red-300 font-mono font-bold">
+              <span className="text-[11px] font-semibold text-stone-700">Emergency Hotlines:</span>
+              <span className="px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 font-mono font-bold">
                 112 (National Emergency)
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-purple-950/60 border border-purple-800 text-purple-300 font-mono font-bold">
+              <span className="px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 font-mono font-bold">
                 1091 (Women in Distress)
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-blue-950/60 border border-blue-800 text-blue-300 font-mono font-bold">
+              <span className="px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 font-mono font-bold">
                 1090 (Delhi Police Helpline)
               </span>
             </div>
 
             {/* GitHub & Project Links */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 font-medium">
               <a
                 href="https://github.com/ignitegap/Safie.git"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 hover:text-white transition-colors"
+                className="flex items-center gap-1.5 text-stone-700 hover:text-rose-600 transition-colors"
               >
                 <Github className="w-4 h-4" />
                 <span>ignitegap/Safie</span>
@@ -240,4 +236,3 @@ export default function Home() {
     </div>
   );
 }
-

@@ -9,12 +9,10 @@ import {
   ShieldAlert,
   Layers,
   Download,
-  User,
-  ChevronRight,
   Menu,
   X,
-  Sparkles,
   PhoneCall,
+  User,
 } from 'lucide-react';
 
 interface LeftCurvedNavbarProps {
@@ -29,7 +27,7 @@ export default function LeftCurvedNavbar({ onOpenDemo, onOpenAuth, user }: LeftC
 
   const navItems = [
     { label: 'Overview', href: '#hero', icon: Compass },
-    { label: 'Delhi/GGM Map', href: '#map', icon: MapPin },
+    { label: 'Safety Map', href: '#map', icon: MapPin },
     {
       label: 'Live Phone Demo',
       action: onOpenDemo,
@@ -38,8 +36,8 @@ export default function LeftCurvedNavbar({ onOpenDemo, onOpenAuth, user }: LeftC
       badge: 'LIVE',
     },
     { label: 'Safe Havens', href: '#safe-havens', icon: ShieldAlert },
-    { label: '4-Tier SOS', href: '#threat-tiers', icon: PhoneCall },
-    { label: 'Architecture', href: '#architecture', icon: Layers },
+    { label: '4-Tier Response', href: '#threat-tiers', icon: PhoneCall },
+    { label: 'Comparison', href: '#comparison', icon: Layers },
     { label: 'Download APK', href: '#download', icon: Download },
   ];
 
@@ -48,10 +46,10 @@ export default function LeftCurvedNavbar({ onOpenDemo, onOpenAuth, user }: LeftC
       {/* Mobile Hamburger Toggle Button */}
       <button
         onClick={() => setIsMobileOpen(!isMobileOpen)}
-        className="fixed bottom-6 left-6 z-50 md:hidden bg-safie-charcoal text-white p-3.5 rounded-full shadow-2xl border border-white/20 flex items-center justify-center"
+        className="fixed bottom-6 left-6 z-50 md:hidden bg-rose-600 text-white p-3.5 rounded-full shadow-2xl border border-rose-300 flex items-center justify-center hover:scale-105 active:scale-95 transition-all"
         aria-label="Toggle Navigation"
       >
-        {isMobileOpen ? <X className="w-6 h-6 text-safie-crimson" /> : <Menu className="w-6 h-6" />}
+        {isMobileOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6" />}
       </button>
 
       {/* Desktop Curved Floating Sidebar with Auto-Hide */}
@@ -63,15 +61,15 @@ export default function LeftCurvedNavbar({ onOpenDemo, onOpenAuth, user }: LeftC
         }`}
       >
         <div
-          className={`h-auto max-h-[85vh] py-6 px-3 bg-safie-charcoal/95 backdrop-blur-xl border border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.35)] rounded-r-[32px] transition-all duration-300 flex flex-col justify-between ${
-            isHovered ? 'shadow-[0_20px_60px_rgba(229,57,53,0.18)]' : ''
+          className={`h-auto max-h-[85vh] py-6 px-3 bg-white/95 backdrop-blur-xl border-y border-r border-rose-200/80 shadow-[0_12px_36px_rgba(225,29,72,0.12)] rounded-r-[32px] transition-all duration-300 flex flex-col justify-between ${
+            isHovered ? 'shadow-[0_20px_50px_rgba(225,29,72,0.18)]' : ''
           }`}
         >
           {/* Header Brand */}
           <div className="flex items-center gap-3 px-2 mb-6">
-            <div className="relative w-9 h-9 rounded-xl overflow-hidden bg-safie-crimson/10 border border-safie-crimson/30 flex-shrink-0 flex items-center justify-center">
+            <div className="relative w-9 h-9 rounded-xl overflow-hidden bg-rose-100 border border-rose-300 flex-shrink-0 flex items-center justify-center">
               <Image
-                src="/images/logo.png"
+                src="/logo.png"
                 alt="Safie Logo"
                 width={32}
                 height={32}
@@ -80,9 +78,9 @@ export default function LeftCurvedNavbar({ onOpenDemo, onOpenAuth, user }: LeftC
             </div>
             {isHovered && (
               <div className="overflow-hidden whitespace-nowrap transition-opacity duration-200">
-                <span className="font-extrabold text-white text-lg tracking-wider block">SAFIE</span>
-                <span className="text-[10px] text-white/50 uppercase tracking-widest block font-medium">
-                  Safety OS
+                <span className="font-black text-stone-900 text-base tracking-tight block">safie</span>
+                <span className="text-[10px] text-rose-600 uppercase tracking-wider block font-bold">
+                  Safety System
                 </span>
               </div>
             )}
@@ -98,142 +96,104 @@ export default function LeftCurvedNavbar({ onOpenDemo, onOpenAuth, user }: LeftC
                   onClick={item.action}
                   className={`flex items-center gap-3.5 px-3 py-2.5 rounded-2xl transition-all text-left group relative ${
                     item.highlight
-                      ? 'bg-gradient-to-r from-safie-crimson/20 to-safie-crimson/5 border border-safie-crimson/40 text-white shadow-lg'
-                      : 'text-white/70 hover:text-white hover:bg-white/10'
+                      ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold shadow-md shadow-rose-200'
+                      : 'text-stone-600 hover:bg-rose-50 hover:text-rose-700'
                   }`}
+                  title={item.label}
                 >
-                  <Icon
-                    className={`w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 ${
-                      item.highlight ? 'text-safie-crimson' : 'text-white/70 group-hover:text-white'
-                    }`}
-                  />
+                  <Icon className={`w-5 h-5 flex-shrink-0 ${item.highlight ? 'text-white' : 'text-stone-500 group-hover:text-rose-600'}`} />
                   {isHovered && (
-                    <span className="whitespace-nowrap text-sm font-medium flex items-center justify-between flex-1">
-                      {item.label}
+                    <span className="text-xs font-semibold whitespace-nowrap flex items-center justify-between w-full">
+                      <span>{item.label}</span>
                       {item.badge && (
-                        <span className="bg-safie-crimson text-white text-[9px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-white/30 text-white font-bold">
                           {item.badge}
                         </span>
                       )}
                     </span>
-                  )}
-                  {!isHovered && item.highlight && (
-                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-safie-crimson rounded-full animate-ping" />
                   )}
                 </button>
               ) : (
                 <a
                   key={idx}
                   href={item.href}
-                  className="flex items-center gap-3.5 px-3 py-2.5 rounded-2xl transition-all text-white/70 hover:text-white hover:bg-white/10 group"
+                  className="flex items-center gap-3.5 px-3 py-2.5 rounded-2xl text-stone-600 hover:bg-rose-50 hover:text-rose-700 transition-all group"
+                  title={item.label}
                 >
-                  <Icon className="w-5 h-5 flex-shrink-0 transition-transform group-hover:scale-110 text-white/70 group-hover:text-white" />
+                  <Icon className="w-5 h-5 flex-shrink-0 text-stone-500 group-hover:text-rose-600 transition-colors" />
                   {isHovered && (
-                    <span className="whitespace-nowrap text-sm font-medium">{item.label}</span>
+                    <span className="text-xs font-semibold whitespace-nowrap text-stone-700 group-hover:text-rose-700">
+                      {item.label}
+                    </span>
                   )}
                 </a>
               );
             })}
           </nav>
 
-          {/* User Account / Profile Footer */}
-          <div className="pt-4 border-t border-white/10 mt-4">
+          {/* Bottom Profile / Quick Action */}
+          <div className="pt-4 border-t border-rose-100 mt-4 px-1">
             <button
-              onClick={onOpenAuth}
-              className="flex items-center gap-3.5 px-2 py-2 rounded-2xl text-white/80 hover:text-white hover:bg-white/10 transition-all w-full text-left"
+              onClick={user ? undefined : onOpenAuth}
+              className="w-full flex items-center gap-3 py-2 rounded-xl text-stone-600 hover:text-rose-700 transition-colors"
+              title={user ? user.name : 'Sign In'}
             >
-              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 border border-white/20">
-                <User className="w-4 h-4 text-white" />
-              </div>
+              <User className="w-5 h-5 flex-shrink-0 text-rose-500" />
               {isHovered && (
-                <div className="overflow-hidden whitespace-nowrap">
-                  <span className="text-xs font-semibold block text-white">
-                    {user ? user.name : 'Sign In / Register'}
-                  </span>
-                  <span className="text-[10px] text-white/50 block">
-                    {user ? user.phone : 'Neon DB Sync'}
-                  </span>
+                <div className="text-left overflow-hidden">
+                  <p className="text-xs font-bold text-stone-800 truncate">
+                    {user ? user.name : 'Citizen Sign In'}
+                  </p>
+                  <p className="text-[10px] text-stone-400 font-mono">
+                    {user ? user.phone : 'Neon Sync'}
+                  </p>
                 </div>
               )}
             </button>
           </div>
-
-          {/* Collapsed Pill Indicator on right edge */}
-          {!isHovered && (
-            <div className="absolute -right-2.5 top-1/2 -translate-y-1/2 w-2.5 h-10 bg-safie-crimson/80 rounded-r-md flex items-center justify-center">
-              <ChevronRight className="w-3 h-3 text-white -ml-0.5" />
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Navigation Drawer */}
       {isMobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
-          onClick={() => setIsMobileOpen(false)}
-        >
-          <div
-            className="w-72 h-full bg-safie-charcoal p-6 flex flex-col justify-between border-r border-white/10"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div>
-              <div className="flex items-center gap-3 mb-8">
-                <Image src="/images/logo.png" alt="Logo" width={36} height={36} />
-                <div>
-                  <span className="font-extrabold text-white text-xl block">SAFIE</span>
-                  <span className="text-xs text-white/50 uppercase tracking-widest block">
-                    Delhi NCR Urban Safety
-                  </span>
-                </div>
+        <div className="fixed inset-0 z-40 bg-stone-900/40 backdrop-blur-sm md:hidden animate-fade-in">
+          <div className="absolute bottom-20 left-4 right-4 bg-white rounded-3xl p-5 border border-rose-200 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between pb-3 border-b border-rose-100">
+              <div className="flex items-center gap-2">
+                <Image src="/logo.png" alt="Safie" width={28} height={28} />
+                <span className="font-black text-stone-900">safie</span>
               </div>
-
-              <div className="flex flex-col gap-2">
-                {navItems.map((item, idx) => {
-                  const Icon = item.icon;
-                  return item.action ? (
-                    <button
-                      key={idx}
-                      onClick={() => {
-                        item.action?.();
-                        setIsMobileOpen(false);
-                      }}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl bg-safie-crimson text-white font-medium text-sm"
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span>{item.label}</span>
-                      {item.badge && (
-                        <span className="ml-auto bg-white text-safie-crimson text-xs font-bold px-2 py-0.5 rounded-full">
-                          {item.badge}
-                        </span>
-                      )}
-                    </button>
-                  ) : (
-                    <a
-                      key={idx}
-                      href={item.href}
-                      onClick={() => setIsMobileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/80 hover:bg-white/10 font-medium text-sm"
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span>{item.label}</span>
-                    </a>
-                  );
-                })}
-              </div>
+              <span className="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">
+                Delhi · NCR
+              </span>
             </div>
 
-            <div className="pt-4 border-t border-white/10">
-              <button
-                onClick={() => {
-                  onOpenAuth();
-                  setIsMobileOpen(false);
-                }}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white/10 text-white font-medium text-sm border border-white/20"
-              >
-                <User className="w-4 h-4" />
-                <span>{user ? user.name : 'Sign In / Register'}</span>
-              </button>
+            <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
+              {navItems.map((item, idx) => (
+                item.action ? (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      item.action!();
+                      setIsMobileOpen(false);
+                    }}
+                    className="p-3 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-bold flex items-center gap-2"
+                  >
+                    <Smartphone className="w-4 h-4" />
+                    <span>Phone Demo</span>
+                  </button>
+                ) : (
+                  <a
+                    key={idx}
+                    href={item.href}
+                    onClick={() => setIsMobileOpen(false)}
+                    className="p-3 rounded-2xl bg-rose-50/60 hover:bg-rose-100 text-stone-700 flex items-center gap-2"
+                  >
+                    <item.icon className="w-4 h-4 text-rose-600" />
+                    <span>{item.label}</span>
+                  </a>
+                )
+              ))}
             </div>
           </div>
         </div>
@@ -241,4 +201,3 @@ export default function LeftCurvedNavbar({ onOpenDemo, onOpenAuth, user }: LeftC
     </>
   );
 }
-

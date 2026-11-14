@@ -9,16 +9,20 @@ module.exports = {
     extend: {
       colors: {
         safie: {
-          crimson: "#E53935",
-          redDark: "#991B1B",
-          cream: "#F9F7F2",
-          sand: "#F4F0E8",
-          charcoal: "#111111",
-          slate: "#0F172A",
-          emerald: "#10B981",
-          emeraldDark: "#166534",
-          amber: "#F59E0B",
-          blue: "#2563EB",
+          blush: "#FFF1F2",
+          blushSoft: "#FFF5F6",
+          roseLight: "#FFE4E6",
+          roseBorder: "#FECDD3",
+          rose: "#E11D48",
+          roseDark: "#BE123C",
+          roseDeep: "#9F1239",
+          plum: "#2A0B1E",
+          plumDeep: "#190513",
+          plumBorder: "#4A1536",
+          charcoal: "#1C1917",
+          cream: "#FAF6F5",
+          emerald: "#059669",
+          emeraldLight: "#D1FAE5",
         }
       },
       fontFamily: {
@@ -26,10 +30,9 @@ module.exports = {
       },
       animation: {
         "pulse-subtle": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "radar-sweep": "spin 4s linear infinite",
+        "soft-float": "float 4s ease-in-out infinite",
       }
     },
   },
   plugins: [],
 };
-
