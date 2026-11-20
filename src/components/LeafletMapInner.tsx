@@ -9,9 +9,10 @@ interface LeafletMapInnerProps {
   city: 'gurugram' | 'delhi' | 'worldwide';
   showLighting: boolean;
   showHavens: boolean;
-  routeType: 'safest' | 'fastest';
+  routeType: string;
   routeData: any;
   safeHavens: SafeHaven[];
+  userLocation?: [number, number] | null;
   onSelectHaven: (haven: SafeHaven) => void;
   onMapClick?: (lat: number, lng: number) => void;
 }
@@ -23,6 +24,7 @@ export default function LeafletMapInner({
   routeType,
   routeData,
   safeHavens,
+  userLocation,
   onSelectHaven,
   onMapClick,
 }: LeafletMapInnerProps) {
@@ -131,7 +133,7 @@ export default function LeafletMapInner({
               ${haven.address}
             </div>
             <div style="font-size: 10px; color: #E11D48; font-weight: 600;">
-              Codeword: "Ask for Angela"
+              Ask for Angela Safe Haven
             </div>
             <div style="font-size: 11px; color: #1C1917; font-weight: 500; margin-top: 4px;">
               Direct: ${haven.phone}
@@ -145,19 +147,22 @@ export default function LeafletMapInner({
 
     // 2. Draw Active Route Polyline
     if (routeData && routeData.coordinates && routeData.coordinates.length > 0) {
-      const isSafest = routeType === 'safest';
+      const isBest = routeType === 'best_supported' || routeType === 'safest';
+      const isBalanced = routeType === 'balanced';
+      const polyColor = isBest ? '#059669' : isBalanced ? '#2563EB' : '#DC2626';
+
       const routePolyline = L.polyline(routeData.coordinates, {
-        color: isSafest ? '#059669' : '#DC2626',
+        color: polyColor,
         weight: 5,
         opacity: 0.9,
-        dashArray: isSafest ? undefined : '6, 6',
+        dashArray: isBest ? undefined : isBalanced ? undefined : '6, 6',
       });
 
       routePolyline.bindTooltip(
         `<div style="font-family: inherit; font-size: 11px; padding: 2px 4px;">
           <strong>${routeData.title}</strong><br/>
           Duration: ${routeData.durationMinutes} mins · Distance: ${routeData.distanceKm} km<br/>
-          Lighting: ${routeData.litPercentage}% · Score: ${routeData.score}/100
+          Lighting: ${routeData.litPercentage}% · Support Index: ${routeData.score}/100
         </div>`,
         { permanent: false, sticky: true }
       );
@@ -180,29 +185,36 @@ export default function LeafletMapInner({
         iconAnchor: [12, 12],
       });
 
-      const startMarker = L.marker(startCoord, { icon: startIcon }).bindTooltip(
-        'Origin (A)',
-        { permanent: false }
-      );
-      const endMarker = L.marker(endCoord, { icon: endIcon }).bindTooltip(
-        'Destination (B)',
-        { permanent: false }
-      );
+      layerGroup.addLayer(L.marker(startCoord, { icon: startIcon }));
+      layerGroup.addLayer(L.marker(endCoord, { icon: endIcon }));
 
-      layerGroup.addLayer(startMarker);
-      layerGroup.addLayer(endMarker);
-
-      // Auto-fit map viewport to the route geometry with margin
-      try {
-        const bounds = routePolyline.getBounds();
-        if (bounds.isValid()) {
-          map.fitBounds(bounds, { padding: [50, 50], maxZoom: 16 });
-        }
-      } catch (e) {
-        console.warn('fitBounds error', e);
+      // Auto-fit bounds
+      const bounds = L.latLngBounds(routeData.coordinates);
+      if (userLocation) {
+        bounds.extend(userLocation);
       }
+      map.fitBounds(bounds, { padding: [40, 40] });
     }
-  }, [showHavens, routeType, routeData, safeHavens, onSelectHaven]);
 
-  return <div ref={mapContainerRef} className="w-full h-full" />;
+    // 3. Draw Live GPS User Location (Pulsing Blue Dot)
+    if (userLocation && userLocation.length === 2) {
+      const liveUserIcon = L.divIcon({
+        html: `
+          <div style="position: relative; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;">
+            <div style="position: absolute; width: 22px; height: 22px; border-radius: 50%; background-color: rgba(37, 99, 235, 0.4); animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;"></div>
+            <div style="width: 14px; height: 14px; border-radius: 50%; background-color: #2563EB; border: 2.5px solid #FFFFFF; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>
+          </div>
+        `,
+        className: 'custom-live-user-pin',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+      });
+
+      const userMarker = L.marker(userLocation, { icon: liveUserIcon, zIndexOffset: 1000 });
+      userMarker.bindTooltip('<strong>You are here (Live GPS)</strong>', { permanent: false });
+      layerGroup.addLayer(userMarker);
+    }
+  }, [showHavens, safeHavens, routeData, routeType, userLocation]);
+
+  return <div ref={mapContainerRef} className="w-full h-[520px] rounded-2xl relative z-10" />;
 }

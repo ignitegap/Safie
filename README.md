@@ -227,3 +227,4 @@ Safie evaluates observable environmental factors, municipal lighting data, open 
 ## License
 
 This project is licensed under the Apache License 2.0.
+

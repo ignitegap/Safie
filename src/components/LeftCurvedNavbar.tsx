@@ -16,7 +16,10 @@ import {
   User,
   Database,
   LogOut,
+  Languages,
+  ClipboardList,
 } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 interface LeftCurvedNavbarProps {
   onOpenDemo: () => void;
@@ -31,17 +34,17 @@ export default function LeftCurvedNavbar({
   user,
   onLogout,
 }: LeftCurvedNavbarProps) {
+  const { lang, setLang, t } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const navItems = [
-    { label: 'Overview', href: '#hero', icon: Compass },
-    { label: 'Safety Map', href: '#map', icon: MapPin },
-    { label: 'Threat Response', href: '#threat-tiers', icon: ShieldAlert },
-    { label: 'Safe Havens', href: '#safe-havens', icon: Shield },
-    { label: 'Comparison', href: '#comparison', icon: Layers },
-    { label: 'Architecture', href: '#architecture', icon: Database },
-    { label: 'Download APK', href: '#download', icon: Download },
+    { label: t('navOverview'), href: '#hero', icon: Compass },
+    { label: t('navSafetyMap'), href: '#map', icon: MapPin },
+    { label: t('navStreetSurvey'), href: '#street-survey', icon: ClipboardList },
+    { label: t('navSafetyTools'), href: '#safety-tools', icon: ShieldAlert },
+    { label: t('navSafeHavens'), href: '#safe-havens', icon: Shield },
+    { label: t('navDownload'), href: '#download', icon: Download },
   ];
 
   return (
@@ -87,6 +90,27 @@ export default function LeftCurvedNavbar({
                 </span>
               </div>
             )}
+          </div>
+
+          {/* Language Switcher */}
+          <div className="py-2 border-b border-rose-100">
+            <button
+              onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+              className={`w-full h-8 px-2 rounded-lg bg-rose-50 hover:bg-rose-100/80 border border-rose-200/80 text-rose-700 font-medium text-xs flex items-center gap-2 transition-colors cursor-pointer ${
+                !isHovered ? 'justify-center' : ''
+              }`}
+              title={lang === 'en' ? 'हिंदी में बदलें (Switch to Hindi)' : 'Switch to English'}
+            >
+              <Languages className="w-3.5 h-3.5 flex-shrink-0 text-rose-600" />
+              {isHovered && (
+                <span className="truncate flex-1 text-left flex items-center justify-between">
+                  <span className="font-medium text-stone-800">{lang === 'en' ? 'हिंदी' : 'English'}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-white border border-rose-200 font-mono text-rose-700 font-semibold uppercase">
+                    {lang === 'en' ? 'HI' : 'EN'}
+                  </span>
+                </span>
+              )}
+            </button>
           </div>
 
           {/* Top Demo Trigger Button */}
@@ -209,6 +233,32 @@ export default function LeftCurvedNavbar({
               >
                 <X className="w-5 h-5" />
               </button>
+            </div>
+
+            {/* Mobile Language Switcher */}
+            <div className="flex items-center justify-between p-2 rounded-xl bg-rose-50 border border-rose-200">
+              <span className="text-xs text-stone-700 font-medium flex items-center gap-1.5">
+                <Languages className="w-3.5 h-3.5 text-rose-600" />
+                <span>{lang === 'en' ? 'Language' : 'भाषा'}:</span>
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setLang('en')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    lang === 'en' ? 'bg-rose-600 text-white shadow-xs' : 'bg-white text-stone-600 border border-rose-100'
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setLang('hi')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    lang === 'hi' ? 'bg-rose-600 text-white shadow-xs' : 'bg-white text-stone-600 border border-rose-100'
+                  }`}
+                >
+                  हिंदी
+                </button>
+              </div>
             </div>
 
             {/* Mobile Demo Trigger */}

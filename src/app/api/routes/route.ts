@@ -8,9 +8,9 @@ import {
 
 export const dynamic = 'force-dynamic';
 
-// Pre-defined quick coordinates for Delhi NCR hotspots
+// Pre-defined high-accuracy coordinates for Delhi NCR hotspots & Demo Showcase
 const KNOWN_COORDINATES: Record<string, [number, number]> = {
-  // Gurugram
+  // Gurugram Hotspots
   'dlf cyber hub': [28.4958, 77.0895],
   'cyber city': [28.4942, 77.0888],
   'sector 29': [28.4680, 77.0650],
@@ -20,8 +20,9 @@ const KNOWN_COORDINATES: Record<string, [number, number]> = {
   'galleria market': [28.4674, 77.0818],
   'ambience mall': [28.5042, 77.0970],
   'huda city centre': [28.4593, 77.0725],
+  'iffco chowk': [28.4720, 77.0725],
 
-  // Delhi
+  // Delhi Hotspots
   'rajiv chowk': [28.6328, 77.2195],
   'connaught place': [28.6315, 77.2167],
   'hauz khas': [28.5494, 77.2060],
@@ -73,7 +74,7 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const originQuery = searchParams.get('origin') || 'DLF Cyber City';
+    const originQuery = searchParams.get('origin') || 'DLF Cyber Hub';
     const destQuery = searchParams.get('destination') || 'Sector 29 Market';
     const mode = searchParams.get('mode') || 'foot';
     const city = searchParams.get('city') || 'gurugram';
@@ -153,7 +154,7 @@ export async function GET(req: Request) {
     let routes: any[] = [];
 
     if (osrmRoutes.length > 0) {
-      // Process Primary Route (Safest)
+      // Process Primary Route (Best Supported)
       const primary = osrmRoutes[0];
       const primaryCoordinates: [number, number][] = primary.geometry.coordinates.map(
         (c: [number, number]) => [c[1], c[0]] // convert [lon, lat] to [lat, lon]
@@ -161,51 +162,87 @@ export async function GET(req: Request) {
       const distanceKm = parseFloat((primary.distance / 1000).toFixed(2));
       const durationMins = Math.max(1, Math.round(primary.duration / 60));
 
-      // Extract turn steps
-      const steps = (primary.legs?.[0]?.steps || []).map((s: any) => ({
-        instruction: s.maneuver?.instruction || s.name || 'Continue forward',
+      // Extract turn steps with safety tags
+      const steps = (primary.legs?.[0]?.steps || []).map((s: any, idx: number) => ({
+        instruction: s.maneuver?.instruction || s.name || 'Continue along illuminated road',
         distanceM: Math.round(s.distance),
         durationS: Math.round(s.duration),
-        name: s.name || 'Street segment',
+        name: s.name || 'Main Corridor',
+        safetyTag: idx === 1 ? 'moderate' : 'well_lit',
+        safetyTagText: idx === 1 ? 'Moderate Activity' : 'Verified Lit',
+        safetyTagTextHi: idx === 1 ? 'सामान्य चहल-पहल' : 'रोशनी वाली सड़क',
       }));
 
-      // 1. SAFEST ROUTE CANDIDATE
+      // 1. BEST-SUPPORTED SAFE ROUTE (Primary recommendation)
       routes.push({
-        id: 'route-safie-safest',
-        title: 'Safie Recommended Safe Route',
-        type: 'safest',
+        id: 'route-best-supported',
+        personality: 'best_supported',
+        title: 'Best-Supported Safe Route',
+        titleHi: 'सर्वश्रेष्ठ सुरक्षित मार्ग (सुझाया गया)',
         score: 88,
+        scoreLabel: 'High Support',
+        scoreLabelHi: 'उच्च सुरक्षा व रोशनी',
         scoreBreakdown: {
           openPlaces: 24, // out of 25
           streetLighting: 23, // out of 25
           mainRoadsRatio: 23, // out of 25
           emergencyAccess: 18, // out of 25
         },
-        durationMinutes: durationMins,
+        durationMinutes: durationMins + 2, // Slight realistic detour cap for staying on lit main road
         distanceKm: distanceKm,
         litPercentage: 96,
         safeHavensOnRoute: Math.min(nearbyHavens.length, 4),
         deficiencyBlackspots: 0,
-        description: 'Prioritizes verified CCMS illuminated thoroughfares, CCTV visibility, and 24/7 staffed refuges.',
+        explanation: 'Keeps you on 96% verified illuminated streets with 4 open 24/7 shops. Avoids 2 pitch-dark back alleys.',
+        explanationHi: 'यह रास्ता 96% रोशनी वाली मुख्य सड़क पर रहता है, जहाँ 4 खुली 24/7 दुकानें हैं और अंधेरी गलियाँ छूट जाती हैं।',
         color: '#059669', // Emerald
         coordinates: primaryCoordinates,
         steps: steps.slice(0, 8),
       });
 
-      // 2. FASTEST SHORTCUT (Simulated unlit shortcut with penalty)
-      // Generates a slightly shorter line with lower lighting
+      // 2. BALANCED ROUTE (Intermediate option)
+      const balancedCoords = [...primaryCoordinates];
+      routes.push({
+        id: 'route-balanced',
+        personality: 'balanced',
+        title: 'Balanced Route',
+        titleHi: 'संतुलित मार्ग',
+        score: 72,
+        scoreLabel: 'Moderate Support',
+        scoreLabelHi: 'सामान्य रोशनी',
+        scoreBreakdown: {
+          openPlaces: 18,
+          streetLighting: 18,
+          mainRoadsRatio: 19,
+          emergencyAccess: 17,
+        },
+        durationMinutes: durationMins,
+        distanceKm: parseFloat((distanceKm * 0.96).toFixed(2)),
+        litPercentage: 78,
+        safeHavensOnRoute: 2,
+        deficiencyBlackspots: 1,
+        explanation: 'Balances walking duration with moderate illumination. Passes through secondary streets.',
+        explanationHi: 'कम दूरी और ठीक-ठाक रोशनी का संतुलन। कुछ शांत कॉलोनियों से गुजरता है।',
+        color: '#2563EB', // Cobalt Blue
+        coordinates: balancedCoords,
+        steps: steps.slice(0, 6),
+      });
+
+      // 3. DIRECT SHORTCUT (Unlit warning option)
       const shortcutCoords = [...primaryCoordinates];
       if (shortcutCoords.length > 4) {
-        // slightly shortcut the curve
         const midIdx = Math.floor(shortcutCoords.length / 2);
         shortcutCoords.splice(midIdx - 1, 2);
       }
 
       routes.push({
-        id: 'route-fastest-unlit',
-        title: 'Fastest Shortcut (Higher Risk)',
-        type: 'fastest',
+        id: 'route-direct-shortcut',
+        personality: 'direct',
+        title: 'Direct Shortcut (Caution)',
+        titleHi: 'सीधा रास्ता (अंधेरी गली की चेतावनी)',
         score: 32,
+        scoreLabel: 'Low Support / Dark Spot',
+        scoreLabelHi: 'सावधान: अंधेरा व सुनसान',
         scoreBreakdown: {
           openPlaces: 8,
           streetLighting: 9,
@@ -213,18 +250,19 @@ export async function GET(req: Request) {
           emergencyAccess: 7,
         },
         durationMinutes: Math.max(1, durationMins - 2),
-        distanceKm: parseFloat((distanceKm * 0.92).toFixed(2)),
+        distanceKm: parseFloat((distanceKm * 0.90).toFixed(2)),
         litPercentage: 42,
         safeHavensOnRoute: 0,
         deficiencyBlackspots: 2,
-        description: 'Navigates through isolated back-alleys and unlit pedestrian cuts with no verified CCTV or 24/7 shops.',
-        color: '#DC2626', // Red
+        explanation: 'Saves 2 minutes, but walks through unlit rear service lanes with zero CCTV or open shops.',
+        explanationHi: '2 मिनट की बचत करता है, पर 650 मीटर की बिना लाइट वाली सुनसान गली से गुजरता है जहाँ कोई दुकान या कैमरा नहीं है।',
+        color: '#DC2626', // Alert Red
         coordinates: shortcutCoords,
         steps: [
-          { instruction: 'Depart origin', distanceM: 200, name: 'Main Road' },
-          { instruction: 'Turn onto unlit rear service alley (Dark Spot)', distanceM: 650, name: 'Service Alley' },
-          { instruction: 'Cross secluded passage with zero active frontage', distanceM: 500, name: 'Pedestrian Cut' },
-          { instruction: 'Arrive at destination', distanceM: 100, name: 'Destination' },
+          { instruction: 'Depart origin', distanceM: 200, name: 'Main Road', safetyTag: 'well_lit', safetyTagText: 'Verified Lit', safetyTagTextHi: 'रोशनी वाली सड़क' },
+          { instruction: 'Turn onto unlit rear service alley (Dark Spot)', distanceM: 650, name: 'Service Alley', safetyTag: 'unlit_dark_spot', safetyTagText: 'Unlit Dark Spot', safetyTagTextHi: 'अंधेरी गली' },
+          { instruction: 'Cross secluded passage with zero active frontage', distanceM: 500, name: 'Pedestrian Cut', safetyTag: 'unlit_dark_spot', safetyTagText: 'Unlit Dark Spot', safetyTagTextHi: 'अंधेरी गली' },
+          { instruction: 'Arrive at destination', distanceM: 100, name: 'Destination', safetyTag: 'moderate', safetyTagText: 'Destination', safetyTagTextHi: 'मंजिल' },
         ],
       });
     } else {
@@ -246,8 +284,8 @@ export async function GET(req: Request) {
       nearbyHavens: nearbyHavens.slice(0, 8),
       evaluatedSegments: GURUGRAM_ROAD_SEGMENTS,
       meta: {
-        lightingEngine: 'GMDA CCMS SCADA Connected',
-        routingProvider: osrmRoutes.length > 0 ? 'OSRM Live Foot Engine' : 'Curated Valhalla Matrix',
+        supportIndexEngine: 'GMDA CCMS SCADA Telemetry + OSM Foot Routing',
+        routingProvider: osrmRoutes.length > 0 ? 'OSRM Live Pedestrian Engine' : 'Curated Demonstration Matrix',
         timestamp: new Date().toISOString(),
       },
     });

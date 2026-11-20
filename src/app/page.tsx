@@ -19,6 +19,7 @@ import {
 import LeftCurvedNavbar from '@/components/LeftCurvedNavbar';
 import HeroSection from '@/components/HeroSection';
 import InteractiveSafetyMap from '@/components/InteractiveSafetyMap';
+import StreetSafetyExplorer from '@/components/StreetSafetyExplorer';
 import ThreatEscalationSection from '@/components/ThreatEscalationSection';
 import SafeHavenSection from '@/components/SafeHavenSection';
 import ComparisonSection from '@/components/ComparisonSection';
@@ -71,7 +72,10 @@ export default function Home() {
         {/* 2. Interactive Delhi-Gurugram Map */}
         <InteractiveSafetyMap />
 
-        {/* 3. 4-Tier Threat Escalation & Duress PIN */}
+        {/* 3. Public Street Lighting & Safety Survey Explorer */}
+        <StreetSafetyExplorer />
+
+        {/* 4. Personal Emergency Shield & Safety Tools */}
         <ThreatEscalationSection onOpenDemo={() => setIsDemoOpen(true)} />
 
         {/* 4. "Ask for Angela" Safe Haven Network */}
