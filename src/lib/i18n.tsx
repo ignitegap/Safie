@@ -145,10 +145,21 @@ export const DICTIONARY: Translations = {
   closeBtn: { en: 'Close', hi: 'बंद करें' },
   cancelBtn: { en: 'Cancel', hi: 'रद्द करें' },
 
-  // Live GPS
+  // Live GPS & Guardian Circle
   gpsTrackingActive: { en: 'Live GPS Walking Companion Active', hi: 'लाइव जीपीएस वॉकिंग सुरक्षा चालू है' },
   gpsOffRouteAlert: { en: 'Alert: You have deviated from the safe lit corridor into an unmapped area.', hi: 'चेतावनी: आप रोशनी वाली सुरक्षित सड़क से हटकर सुनसान तरफ जा रहे हैं।' },
   gpsShareLink: { en: 'Share Live Location with Family', hi: 'परिवार के साथ लाइव लोकेशन शेयर करें' },
+  navGuardianCircle: { en: 'Guardian Circle', hi: 'संरक्षक सर्कल' },
+  tabGuardian: { en: 'Circle', hi: 'परिवार' },
+  btnUneasy: { en: "I'm Feeling Uneasy", hi: 'असहज लग रहा है' },
+  btnSafeArrival: { en: 'Confirm Safe Arrival', hi: 'सुरक्षित पहुँचे' },
+  temporalTime: { en: 'Select Travel Time (Night Activity Curve)', hi: 'यात्रा का समय चुनें (नाइट एक्टिविटी कर्व)' },
+  unexpectedStop: { en: 'Prolonged Stationary Stop Detected', hi: 'अचानक लंबे समय तक रुकने की चेतावनी' },
+  infrastructureCoverage: { en: 'Verified Infrastructure Telemetry', hi: 'सत्यापित बुनियादी ढांचा डेटा' },
+  cctvCount: { en: 'CCTV Surveillance Points', hi: 'सीसीटीवी कैमरे' },
+  policeKiosks: { en: 'Active Police & PCR Kiosks', hi: 'पुलिस व पीसीआर चौकियां' },
+  smartPoles: { en: 'Smart Streetlight Poles', hi: 'स्मार्ट स्ट्रीटलाइट पोल्स' },
+  havensCount: { en: 'Verified 24/7 Sanctuaries', hi: '24/7 प्रमाणित ठिकाने' },
 };
 
 interface LanguageContextType {

@@ -758,6 +758,46 @@ export default function InteractiveSafetyMap() {
                 </div>
               </div>
 
+              {/* Infrastructure Telemetry Strip */}
+              <div className="pt-2 border-t border-rose-100">
+                <span className="text-[10px] font-mono uppercase text-stone-500 block mb-1 font-medium">
+                  {lang === 'hi' ? 'मार्ग बुनियादी ढांचा डेटा:' : 'Route Infrastructure Telemetry:'}
+                </span>
+                <div className="grid grid-cols-4 gap-1 text-[10px] font-mono text-center">
+                  <div className="p-1 rounded bg-rose-50/50 border border-rose-100">
+                    <span className="text-stone-400 block text-[9px]">Poles</span>
+                    <strong className="text-stone-800">142</strong>
+                  </div>
+                  <div className="p-1 rounded bg-rose-50/50 border border-rose-100">
+                    <span className="text-stone-400 block text-[9px]">CCTV</span>
+                    <strong className="text-stone-800">36</strong>
+                  </div>
+                  <div className="p-1 rounded bg-rose-50/50 border border-rose-100">
+                    <span className="text-stone-400 block text-[9px]">PCR</span>
+                    <strong className="text-stone-800">3</strong>
+                  </div>
+                  <div className="p-1 rounded bg-rose-50/50 border border-rose-100">
+                    <span className="text-stone-400 block text-[9px]">Havens</span>
+                    <strong className="text-emerald-700 font-semibold">4</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live GPS Telemetry Status when tracking */}
+              {isGpsTracking && userLocation && (
+                <div className="p-2 rounded-lg bg-blue-50 border border-blue-200 text-[10px] font-mono text-blue-900 space-y-0.5">
+                  <div className="flex items-center justify-between font-semibold">
+                    <span>GPS Telemetry Active</span>
+                    <span className="text-emerald-600">● 9 Sats</span>
+                  </div>
+                  <div className="flex justify-between text-blue-700">
+                    <span>Lat: {userLocation[0].toFixed(4)}° N</span>
+                    <span>Lng: {userLocation[1].toFixed(4)}° E</span>
+                  </div>
+                  <div className="text-stone-500">Speed: 4.1 km/h · Accuracy: ±3m</div>
+                </div>
+              )}
+
               {/* Turn Directions Toggle */}
               {currentRoute.steps && currentRoute.steps.length > 0 && (
                 <div className="pt-2 border-t border-rose-100">

@@ -31,6 +31,13 @@ import {
   Zap,
   Activity,
   Sparkles,
+  Users,
+  Heart,
+  Share2,
+  MapPin,
+  Eye,
+  Bell,
+  AlertOctagon,
 } from 'lucide-react';
 import { DELHI_NCR_SAFE_HAVENS, SafeHaven } from '@/lib/data-delhi-ncr';
 import { useLanguage } from '@/lib/i18n';
@@ -40,7 +47,7 @@ interface PhoneMockupDemoProps {
   onClose: () => void;
 }
 
-type DemoTab = 'safety-hold' | 'navigation' | 'fake-call' | 'panic-tools' | 'safe-havens';
+type DemoTab = 'safety-hold' | 'guardian' | 'fake-call' | 'panic' | 'walk-sim' | 'havens';
 
 interface CallPersona {
   id: string;
@@ -91,14 +98,53 @@ const CALL_PERSONAS: CallPersona[] = [
   },
 ];
 
+interface GuardianContact {
+  id: string;
+  name: string;
+  nameHi: string;
+  relation: string;
+  relationHi: string;
+  status: 'watching' | 'idle';
+  battery: number;
+  lastPing: string;
+}
+
+const INITIAL_GUARDIANS: GuardianContact[] = [
+  {
+    id: 'g-1',
+    name: 'Rajesh Sharma (Dad)',
+    nameHi: 'राजेश शर्मा (पापा)',
+    relation: 'Primary Guardian',
+    relationHi: 'मुख्य संरक्षक',
+    status: 'watching',
+    battery: 84,
+    lastPing: '2s ago',
+  },
+  {
+    id: 'g-2',
+    name: 'Priya (Sister)',
+    nameHi: 'प्रिया (बहन)',
+    relation: 'Emergency Circle',
+    relationHi: 'इमरजेंसी सर्कल',
+    status: 'watching',
+    battery: 92,
+    lastPing: '5s ago',
+  },
+  {
+    id: 'g-3',
+    name: 'Aanya (Roommate)',
+    nameHi: 'आन्या (रूममेट)',
+    relation: 'Emergency Circle',
+    relationHi: 'इमरजेंसी सर्कल',
+    status: 'idle',
+    battery: 61,
+    lastPing: '1m ago',
+  },
+];
+
 export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProps) {
   const { lang, t } = useLanguage();
   const [activeTab, setActiveTab] = useState<DemoTab>('safety-hold');
-
-  // Navigation State
-  const [selectedRoute, setSelectedRoute] = useState<'safest' | 'fastest'>('safest');
-  const [isNavigating, setIsNavigating] = useState(false);
-  const [navStepIndex, setNavStepIndex] = useState(0);
 
   // Safety Hold State
   const [isHolding, setIsHolding] = useState(false);
@@ -109,10 +155,14 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
     message: string;
   }>({ status: 'idle', message: '' });
 
+  // Guardian Circle State
+  const [guardians, setGuardians] = useState<GuardianContact[]>(INITIAL_GUARDIANS);
+  const [guardianPingRate, setGuardianPingRate] = useState<'30s' | '5s'>('30s');
+  const [guardianNotification, setGuardianNotification] = useState<string>('');
+
   // Enhanced Fake Call State
   const [callPersona, setCallPersona] = useState<CallPersona>(CALL_PERSONAS[0]);
   const [callAudioMode, setCallAudioMode] = useState<'speaker' | 'earpiece'>('speaker');
-  const [callDelaySeconds, setCallDelaySeconds] = useState<number>(0);
   const [callState, setCallState] = useState<'idle' | 'scheduled' | 'ringing' | 'active'>('idle');
   const [callDuration, setCallDuration] = useState(0);
   const [scheduledCountdown, setScheduledCountdown] = useState(0);
@@ -128,27 +178,66 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
   const [strobeFlash, setStrobeFlash] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const oscillatorRef = useRef<OscillatorNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
 
-  // Stealth SOS / Shake state
+  // Stealth Shake SOS
   const [stealthSosActive, setStealthSosActive] = useState(false);
   const [stealthSosMsg, setStealthSosMsg] = useState('');
 
-  // Mesh State
-  const [meshNodes, setMeshNodes] = useState(7);
-  const [meshBroadcasting, setMeshBroadcasting] = useState(false);
-  const [meshLogs, setMeshLogs] = useState<string[]>([]);
+  // Walk Sim State
+  const [isWalking, setIsWalking] = useState(false);
+  const [walkStepIndex, setWalkStepIndex] = useState(0);
+  const [simUnexpectedStop, setSimUnexpectedStop] = useState(false);
+  const [simDeviationAlert, setSimDeviationAlert] = useState(false);
 
   // Clock
   const [timeStr, setTimeStr] = useState('23:42');
 
-  const navigationSteps = [
-    { text: 'Start at DLF Cyber City Rapid Metro', textHi: 'डीएलएफ साइबर सिटी रैपिड मेट्रो से शुरू करें', distance: '100m' },
-    { text: 'Turn right onto DLF Phase 2 Illuminated Corridor', textHi: 'दाएं मुड़ें: डीएलएफ फेज़ 2 रोशनी वाली मुख्य सड़क', distance: '350m' },
-    { text: 'Passing 24/7 Apollo Pharmacy Sanctuary on left', textHi: 'बाईं ओर 24/7 अपोलो फार्मेसी सुरक्षित ठिकाना', distance: '400m' },
-    { text: 'Continue straight along MG Road Main Arterial', textHi: 'एमजी रोड मुख्य सड़क पर सीधे चलते रहें', distance: '1.2 km' },
-    { text: 'Turn left toward Sector 29 Leisure Valley Corridor', textHi: 'बाएं मुड़ें: सेक्टर 29 लेज़र वैली रास्ता', distance: '800m' },
-    { text: 'Arrive safely at Sector 29 Market', textHi: 'सेक्टर 29 मार्केट सुरक्षित पहुँचे', distance: 'Destination' },
+  const walkCorridorSteps = [
+    {
+      title: 'DLF Cyber City Metro Exit',
+      titleHi: 'डीएलएफ साइबर सिटी मेट्रो निकास',
+      details: '24/7 CCTV coverage · CISF Security Kiosk',
+      detailsHi: '24/7 सीसीटीवी कवरेज · सीआईएसएफ सुरक्षा चौकी',
+      distance: 'Start',
+      lit: '100% Lit',
+      tag: 'Safe Hub',
+    },
+    {
+      title: 'Passing Apollo Pharmacy 24/7',
+      titleHi: 'अपोलो फार्मेसी 24/7 के पास',
+      details: 'Certified Safe Haven · Ask for Angela',
+      detailsHi: 'प्रमाणित सुरक्षित ठिकाना · आस्क फॉर एंजेला',
+      distance: '350m',
+      lit: '98% Lit',
+      tag: 'Sanctuary',
+    },
+    {
+      title: 'MG Road Main Lit Arterial',
+      titleHi: 'एमजी रोड मुख्य रोशनी वाला मार्ग',
+      details: 'GMDA CCMS Smart Poles · Active traffic flow',
+      detailsHi: 'जीएमडीए स्मार्ट पोल्स · सक्रिय यातायात व दुकानें',
+      distance: '850m',
+      lit: '95% Lit',
+      tag: 'Corridor',
+    },
+    {
+      title: 'Leisure Valley Road Turn',
+      titleHi: 'लेज़र वैली रोड मोड़',
+      details: 'Well-lit pedestrian sidewalk · Guard present',
+      detailsHi: 'रोशन फुटपाथ · सुरक्षा गार्ड तैनात',
+      distance: '1.2 km',
+      lit: '92% Lit',
+      tag: 'Corridor',
+    },
+    {
+      title: 'Arrival at Sector 29 Market',
+      titleHi: 'सेक्टर 29 मार्केट सुरक्षित पहुँचे',
+      details: 'Commercial hub · Destination achieved',
+      detailsHi: 'व्यावसायिक क्षेत्र · यात्रा सुरक्षित पूरी',
+      distance: 'Arrived',
+      lit: '100% Lit',
+      tag: 'Destination',
+    },
   ];
 
   // Clock update
@@ -164,18 +253,16 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
     return () => clearInterval(interval);
   }, []);
 
-  // Step advancement during active navigation
+  // Step advancement during active simulated walk
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (isNavigating) {
+    if (isWalking && !simUnexpectedStop && !simDeviationAlert) {
       interval = setInterval(() => {
-        setNavStepIndex((prev) => (prev + 1) % navigationSteps.length);
-      }, 4000);
-    } else {
-      setNavStepIndex(0);
+        setWalkStepIndex((prev) => (prev + 1) % walkCorridorSteps.length);
+      }, 4500);
     }
     return () => clearInterval(interval);
-  }, [isNavigating]);
+  }, [isWalking, simUnexpectedStop, simDeviationAlert, walkCorridorSteps.length]);
 
   // Safety Hold countdown timer
   useEffect(() => {
@@ -189,7 +276,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
         status: 'duress',
         message:
           lang === 'hi'
-            ? '10 सेकंड पूरे: दिल्ली-गुरुग्राम पुलिस (112) और परिजनों को लाइव लोकेशन के साथ आपातकालीन संकट अलर्ट भेजा गया।'
+            ? '10 सेकंड पूरे: पुलिस कंट्रोल रूम (112) और संरक्षक संपर्कों को लाइव लोकेशन के साथ संकट अलर्ट भेजा गया।'
             : '10s Window Expired: Emergency SOS packet dispatched with live GPS to Police Control Room (112) & registered emergency contacts.',
       });
     }
@@ -252,7 +339,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
           setJourneyMinutesLeft((prev) => prev - 1);
           setJourneySecondsLeft(59);
         } else {
-          // Timer expired without disarm!
           setJourneyTimerActive(false);
           setJourneyTimerStatus(
             lang === 'hi'
@@ -278,7 +364,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
     return () => clearInterval(interval);
   }, [isSirenActive]);
 
-  // Acoustic Siren Audio synthesis (Web Audio API)
+  // Siren Audio synthesis (Web Audio API)
   const startSirenAudio = () => {
     try {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
@@ -290,7 +376,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(800, ctx.currentTime);
 
-      // Modulate frequency to create police siren effect
       let freq = 800;
       let goingUp = true;
       const sirenModulator = setInterval(() => {
@@ -315,7 +400,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
 
       audioCtxRef.current = ctx;
       oscillatorRef.current = osc;
-      gainNodeRef.current = gain;
     } catch (e) {
       console.warn('Web Audio Siren error', e);
     }
@@ -347,7 +431,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
     }
   };
 
-  // Cleanup siren when modal closes
   useEffect(() => {
     return () => {
       stopSirenAudio();
@@ -372,7 +455,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
     }
   };
 
-  // Handle PIN Submission
   const handlePinSubmit = (pin: string) => {
     if (pin === '1234') {
       setCountdown(null);
@@ -399,18 +481,29 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
     }
   };
 
-  // Trigger Fake Call
-  const handleTriggerFakeCall = (delay: number) => {
-    if (delay === 0) {
-      setCallState('ringing');
-    } else {
-      setCallDelaySeconds(delay);
-      setScheduledCountdown(delay);
-      setCallState('scheduled');
+  // Guardian Circle Actions
+  const handleSendUneasyAlert = () => {
+    setGuardianPingRate('5s');
+    setGuardianNotification(
+      lang === 'hi'
+        ? 'असहज अलर्ट भेजा गया! पापा व प्रिया को हाई-प्रायोरिटी अलर्ट मिला। जीपीएस ट्रैकिंग 5s गति पर सक्रिय।'
+        : "Uneasy Ping Broadcast! Rajesh & Priya received priority alert. Location tracking frequency accelerated to 5 seconds."
+    );
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      navigator.vibrate([100, 50, 100]);
     }
   };
 
-  // Stealth Shake / Rapid Tap SOS
+  const handleConfirmArrival = () => {
+    setGuardianPingRate('30s');
+    setGuardianNotification(
+      lang === 'hi'
+        ? 'सुरक्षित आगमन संदेश भेजा गया! संरक्षक सर्कल को सूचित कर दिया गया है।'
+        : 'Safe Arrival Broadcast! Your Guardian Circle has been notified that you reached safely.'
+    );
+  };
+
+  // Stealth Shake SOS
   const triggerStealthSos = () => {
     setStealthSosActive(true);
     setStealthSosMsg(
@@ -426,20 +519,38 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
     }, 4000);
   };
 
-  const triggerMeshRelay = () => {
-    setMeshBroadcasting(true);
-    setMeshLogs(['Broadcasting encrypted SOS packet via BLE...']);
-    setTimeout(() => {
-      setMeshLogs((prev) => [...prev, 'Node 1 (Galaxy S23, 12m away) relayed packet']);
-    }, 800);
-    setTimeout(() => {
-      setMeshLogs((prev) => [...prev, 'Node 2 (iPhone 14, 45m away) forwarded to 5G Cell']);
-      setMeshNodes((n) => n + 2);
-    }, 1600);
-    setTimeout(() => {
-      setMeshLogs((prev) => [...prev, 'SOS Delivered to 112 Gateway over zero mobile data']);
-      setMeshBroadcasting(false);
-    }, 2400);
+  // 1-Click Guided Scenario Launcher (for Sandbox Companion)
+  const launchScenario = (scenarioKey: string) => {
+    if (scenarioKey === 'duress') {
+      setActiveTab('safety-hold');
+      setCountdown(null);
+      setIsHolding(false);
+      setPinFeedback({
+        status: 'duress',
+        message:
+          lang === 'hi'
+            ? 'डेमो 9876 गुप्त पिन सक्रिय: हमलावर के सामने "अलार्म रद्द" दिखता है, जबकि 112 पुलिस को गुप्त रेड अलर्ट जाता है।'
+            : 'Duress PIN (9876) Activated: Displays fake "Alarm Cancelled" to an aggressor while transmitting high-priority red alert with live GPS to 112 Police.',
+      });
+    } else if (scenarioKey === 'fake-call') {
+      setActiveTab('fake-call');
+      setCallPersona(CALL_PERSONAS[0]); // Bhaiya
+      setCallState('ringing');
+    } else if (scenarioKey === 'siren') {
+      setActiveTab('panic');
+      if (!isSirenActive) {
+        setIsSirenActive(true);
+        startSirenAudio();
+      }
+    } else if (scenarioKey === 'unexpected-stop') {
+      setActiveTab('walk-sim');
+      setIsWalking(true);
+      setSimUnexpectedStop(true);
+      setSimDeviationAlert(false);
+    } else if (scenarioKey === 'guardian') {
+      setActiveTab('guardian');
+      handleSendUneasyAlert();
+    }
   };
 
   if (!isOpen) return null;
@@ -447,11 +558,11 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-stone-900/50 backdrop-blur-xs overflow-y-auto">
       {/* Container */}
-      <div className="relative max-w-4xl w-full flex flex-col md:flex-row items-center justify-center gap-6 py-4">
+      <div className="relative max-w-5xl w-full flex flex-col lg:flex-row items-center justify-center gap-6 py-4">
         {/* Floating Close Button */}
         <button
           onClick={onClose}
-          className="absolute -top-2 right-2 md:-top-3 md:-right-3 z-50 p-2 rounded-full bg-white text-stone-700 hover:bg-stone-100 transition-colors border border-rose-200 shadow-md cursor-pointer"
+          className="absolute -top-2 right-2 lg:-top-3 lg:-right-3 z-50 p-2 rounded-full bg-white text-stone-700 hover:bg-stone-100 transition-colors border border-rose-200 shadow-md cursor-pointer"
           aria-label="Close phone simulator"
         >
           <X className="w-5 h-5" />
@@ -460,7 +571,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
         {/* ============================================================== */}
         {/* PHYSICAL PHONE SHELL */}
         {/* ============================================================== */}
-        <div className="relative w-[340px] sm:w-[360px] h-[700px] rounded-[48px] p-3 bg-stone-900 border-[3px] border-stone-800 shadow-2xl flex-shrink-0 select-none">
+        <div className="relative w-[340px] sm:w-[360px] h-[710px] rounded-[48px] p-3 bg-stone-900 border-[3px] border-stone-800 shadow-2xl flex-shrink-0 select-none">
           {/* Side Hardware Buttons */}
           <div className="absolute -left-[5px] top-28 w-[2px] h-10 bg-stone-700 rounded-l-sm" />
           <div className="absolute -left-[5px] top-42 w-[2px] h-12 bg-stone-700 rounded-l-sm" />
@@ -496,15 +607,15 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
 
             {/* SCREEN BODY CONTENT SWITCHER */}
             <div className="flex-1 overflow-y-auto px-4 py-2 relative text-left">
-              {/* TAB 1: SAFETY HOLD (DEAD MAN'S SWITCH) */}
+              {/* TAB 1: SAFETY HOLD */}
               {activeTab === 'safety-hold' && (
                 <div className="space-y-3 flex flex-col items-center text-center">
                   <div>
                     <span className="text-[10px] font-mono text-stone-500 uppercase">
-                      {lang === 'hi' ? 'डेड मैन्स स्विच' : "Dead Man's Switch Engine"}
+                      {lang === 'hi' ? 'डेड मैन्स स्विच' : "Dead Man's Switch"}
                     </span>
                     <h3 className="text-sm font-semibold text-stone-900">
-                      {lang === 'hi' ? 'सुरक्षा होल्ड बटन' : 'Safety Hold'}
+                      {lang === 'hi' ? 'सुरक्षा होल्ड बटन' : 'Safety Hold Switch'}
                     </h3>
                     <p className="text-[11px] text-stone-500 max-w-[240px] mx-auto mt-0.5 leading-snug">
                       {lang === 'hi'
@@ -513,7 +624,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </p>
                   </div>
 
-                  {/* Tactile Hold Trigger Button */}
                   {countdown === null && (
                     <div className="py-2">
                       <button
@@ -538,18 +648,15 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </div>
                   )}
 
-                  {/* 10s Countdown Alert Window */}
                   {countdown !== null && (
                     <div className="w-full p-3 rounded-xl bg-rose-600 text-white space-y-1 animate-pulse">
                       <div className="flex items-center justify-center gap-1.5 text-xs font-semibold">
                         <AlertTriangle className="w-4 h-4 text-white" />
                         <span>{lang === 'hi' ? 'हाथ छूटा: अलार्म सक्रिय' : 'Safety Hold Released'}</span>
                       </div>
-
                       <div className="text-3xl font-semibold font-mono tracking-widest tabular-nums">
                         00:{countdown < 10 ? `0${countdown}` : countdown}
                       </div>
-
                       <p className="text-[10px] text-rose-100">
                         {lang === 'hi'
                           ? 'रद्द करने के लिए पिन डालें। 00:00 होते ही पुलिस को अलर्ट जाएगा।'
@@ -558,7 +665,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </div>
                   )}
 
-                  {/* PIN Input Keypad */}
                   <div className="w-full max-w-[240px] space-y-2">
                     <div className="flex items-center justify-center gap-1.5">
                       <input
@@ -577,7 +683,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                       </button>
                     </div>
 
-                    {/* PIN Quick Demo Buttons */}
                     <div className="flex items-center justify-center gap-2 text-[10px]">
                       <button
                         onClick={() => handlePinSubmit('1234')}
@@ -593,7 +698,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                       </button>
                     </div>
 
-                    {/* Feedback */}
                     {pinFeedback.message && (
                       <div
                         className={`p-2 rounded-lg text-[10px] text-left leading-normal ${
@@ -611,7 +715,110 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                 </div>
               )}
 
-              {/* TAB 2: ENHANCED FAKE CALL SUITE */}
+              {/* TAB 2: GUARDIAN CIRCLE (LIVE TRUSTED CONTACTS) */}
+              {activeTab === 'guardian' && (
+                <div className="space-y-3 text-left">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-[10px] font-mono text-stone-500 uppercase">
+                        {lang === 'hi' ? 'लाइव जर्नी मॉनिटरिंग' : 'Live Journey Sharing'}
+                      </span>
+                      <h3 className="text-sm font-semibold text-stone-900">
+                        {lang === 'hi' ? 'गार्जियन सर्कल (संरक्षक)' : 'Guardian Circle (3 Active)'}
+                      </h3>
+                    </div>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      Ping: {guardianPingRate}
+                    </span>
+                  </div>
+
+                  {/* 1-Tap Quick Action Buttons */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <button
+                      onClick={handleSendUneasyAlert}
+                      className="p-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium text-left transition-colors cursor-pointer flex flex-col justify-between h-18 shadow-xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <AlertTriangle className="w-3.5 h-3.5" />
+                        <span className="text-[9px] font-mono uppercase bg-white/20 px-1 rounded">Fast 5s Ping</span>
+                      </div>
+                      <div>
+                        <strong className="block text-[11px] leading-snug">
+                          {lang === 'hi' ? 'असहज लग रहा है' : "I'm Feeling Uneasy"}
+                        </strong>
+                        <span className="text-[9px] opacity-90 block">
+                          {lang === 'hi' ? 'परिवार को सतर्क करें' : 'Alert circle discreetly'}
+                        </span>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={handleConfirmArrival}
+                      className="p-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-left transition-colors cursor-pointer flex flex-col justify-between h-18 shadow-xs"
+                    >
+                      <div className="flex items-center justify-between">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span className="text-[9px] font-mono uppercase bg-white/20 px-1 rounded">All Clear</span>
+                      </div>
+                      <div>
+                        <strong className="block text-[11px] leading-snug">
+                          {lang === 'hi' ? 'सुरक्षित पहुँची' : 'Confirm Safe Arrival'}
+                        </strong>
+                        <span className="text-[9px] opacity-90 block">
+                          {lang === 'hi' ? 'सर्कल को सूचित करें' : 'Broadcast arrival'}
+                        </span>
+                      </div>
+                    </button>
+                  </div>
+
+                  {guardianNotification && (
+                    <div className="p-2 rounded-lg bg-rose-50 border border-rose-200 text-[10.5px] text-rose-900 leading-snug">
+                      {guardianNotification}
+                    </div>
+                  )}
+
+                  {/* Trusted Contacts List */}
+                  <div className="space-y-1.5 max-h-56 overflow-y-auto pr-0.5">
+                    {guardians.map((g) => (
+                      <div
+                        key={g.id}
+                        className="p-2.5 rounded-xl bg-white border border-rose-100 flex items-center justify-between text-xs shadow-2xs"
+                      >
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-stone-900">
+                              {lang === 'hi' ? g.nameHi : g.name}
+                            </span>
+                            <span className="text-[9px] px-1 py-0.2 rounded bg-stone-100 text-stone-600 font-mono">
+                              {lang === 'hi' ? g.relationHi : g.relation}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] text-stone-500">
+                            <span className="flex items-center gap-1">
+                              <Battery className="w-3 h-3 text-emerald-600" />
+                              <span>{g.battery}%</span>
+                            </span>
+                            <span>·</span>
+                            <span>Ping: {g.lastPing}</span>
+                          </div>
+                        </div>
+
+                        <span
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded font-medium ${
+                            g.status === 'watching'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-stone-100 text-stone-500'
+                          }`}
+                        >
+                          {g.status === 'watching' ? (lang === 'hi' ? 'लाइव निगरानी' : 'Live') : (lang === 'hi' ? 'स्टैंडबाय' : 'Standby')}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 3: FAKE CALL SUITE */}
               {activeTab === 'fake-call' && (
                 <div className="space-y-3 text-left">
                   <div>
@@ -625,7 +832,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
 
                   {callState === 'idle' && (
                     <div className="space-y-2.5">
-                      {/* Persona Selector */}
                       <div className="p-2.5 rounded-xl bg-white border border-rose-100 space-y-1.5">
                         <label className="text-[10px] font-mono text-stone-500 uppercase block font-medium">
                           {lang === 'hi' ? 'कॉल करने वाले का चयन करें:' : 'Select Caller Persona:'}
@@ -649,7 +855,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                         </div>
                       </div>
 
-                      {/* Output Mode & Delay */}
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="p-2 rounded-xl bg-white border border-rose-100 space-y-1">
                           <label className="text-[10px] font-mono text-stone-500 block">
@@ -688,21 +893,27 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                           <div className="grid grid-cols-3 gap-1 text-[9px] font-mono">
                             <button
                               type="button"
-                              onClick={() => handleTriggerFakeCall(0)}
+                              onClick={() => setCallState('ringing')}
                               className="py-1 rounded bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 cursor-pointer font-semibold"
                             >
                               {lang === 'hi' ? 'तुरंत' : 'Now'}
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleTriggerFakeCall(15)}
+                              onClick={() => {
+                                setScheduledCountdown(15);
+                                setCallState('scheduled');
+                              }}
                               className="py-1 rounded bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 cursor-pointer"
                             >
                               15s
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleTriggerFakeCall(30)}
+                              onClick={() => {
+                                setScheduledCountdown(30);
+                                setCallState('scheduled');
+                              }}
                               className="py-1 rounded bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 cursor-pointer"
                             >
                               30s
@@ -711,9 +922,8 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                         </div>
                       </div>
 
-                      {/* Main Trigger Button */}
                       <button
-                        onClick={() => handleTriggerFakeCall(0)}
+                        onClick={() => setCallState('ringing')}
                         className="w-full h-9 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                       >
                         <PhoneCall className="w-3.5 h-3.5" />
@@ -722,7 +932,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </div>
                   )}
 
-                  {/* Scheduled Countdown Screen */}
                   {callState === 'scheduled' && (
                     <div className="p-4 rounded-xl bg-stone-900 text-white text-center space-y-2">
                       <span className="text-[10px] font-mono uppercase text-amber-400">
@@ -748,7 +957,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </div>
                   )}
 
-                  {/* Ringing Screen */}
                   {callState === 'ringing' && (
                     <div className="p-4 rounded-xl bg-stone-900 text-white text-center space-y-3 animate-pulse">
                       <p className="text-[10px] font-mono text-stone-400 uppercase tracking-wider">
@@ -782,7 +990,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </div>
                   )}
 
-                  {/* Active In-Call Screen with Voice Feedback */}
                   {callState === 'active' && (
                     <div className="p-4 rounded-xl bg-stone-900 text-white text-center space-y-3">
                       <div className="flex items-center justify-between text-xs text-rose-400">
@@ -812,19 +1019,19 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                 </div>
               )}
 
-              {/* TAB 3: PANIC TOOLS (WATCH OVER ME, SIREN & STROBE, STEALTH SOS) */}
-              {activeTab === 'panic-tools' && (
+              {/* TAB 4: PANIC TOOLS */}
+              {activeTab === 'panic' && (
                 <div className="space-y-3 text-left">
                   <div>
                     <span className="text-[10px] font-mono text-stone-500 uppercase">
                       {lang === 'hi' ? 'आपातकालीन ढाल' : 'Emergency Shield Tools'}
                     </span>
                     <h3 className="text-sm font-semibold text-stone-900">
-                      {lang === 'hi' ? 'यात्रा टाइमर, सायरन व शेक एसओएस' : 'Journey Timer, Siren & Stealth SOS'}
+                      {lang === 'hi' ? 'सायरन, यात्रा टाइमर व शेक एसओएस' : 'Siren, Journey Timer & Stealth SOS'}
                     </h3>
                   </div>
 
-                  {/* Tool 1: Strobe & Acoustic Siren Button */}
+                  {/* Siren Button */}
                   <div className="p-3 rounded-xl bg-white border border-rose-100 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-stone-900 flex items-center gap-1.5">
@@ -835,12 +1042,6 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                         Web Audio
                       </span>
                     </div>
-                    <p className="text-[10px] text-stone-500 leading-snug">
-                      {lang === 'hi'
-                        ? 'तेज़ सायरन बजाएं और स्क्रीन को लाल-सफेद चमकाएं ताकि आस-पास के लोगों का ध्यान तुरंत जाए।'
-                        : 'Blasts an acoustic siren and flashes the screen to startle aggressors and summon crowd help.'}
-                    </p>
-
                     <button
                       onClick={toggleSiren}
                       className={`w-full h-8 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer ${
@@ -854,7 +1055,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </button>
                   </div>
 
-                  {/* Tool 2: Watch Over Me Journey Check-in */}
+                  {/* Watch Over Me */}
                   <div className="p-3 rounded-xl bg-white border border-rose-100 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-stone-900 flex items-center gap-1.5">
@@ -867,44 +1068,34 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                     </div>
 
                     {!journeyTimerActive ? (
-                      <div className="space-y-1.5">
-                        <p className="text-[10px] text-stone-500 leading-snug">
-                          {lang === 'hi'
-                            ? 'घर पहुँचने का अनुमानित समय सेट करें। समय खत्म होने से पहले पिन न डालने पर परिजनों को अलर्ट जाएगा।'
-                            : 'Set an expected arrival timer. If you do not disarm before 00:00, contacts get your live location.'}
-                        </p>
-                        <div className="flex items-center gap-1 text-xs">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setJourneyMinutesLeft(15);
-                              setJourneySecondsLeft(0);
-                              setJourneyTimerActive(true);
-                              setJourneyTimerStatus('');
-                            }}
-                            className="flex-1 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-800 font-mono text-[11px] cursor-pointer"
-                          >
-                            15 Mins
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setJourneyMinutesLeft(0);
-                              setJourneySecondsLeft(15);
-                              setJourneyTimerActive(true);
-                              setJourneyTimerStatus('');
-                            }}
-                            className="flex-1 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-mono text-[11px] border border-emerald-200 cursor-pointer"
-                          >
-                            15s (Demo)
-                          </button>
-                        </div>
+                      <div className="flex items-center gap-1 text-xs">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setJourneyMinutesLeft(15);
+                            setJourneySecondsLeft(0);
+                            setJourneyTimerActive(true);
+                            setJourneyTimerStatus('');
+                          }}
+                          className="flex-1 py-1 rounded bg-stone-100 hover:bg-stone-200 text-stone-800 font-mono text-[11px] cursor-pointer"
+                        >
+                          15 Mins
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setJourneyMinutesLeft(0);
+                            setJourneySecondsLeft(15);
+                            setJourneyTimerActive(true);
+                            setJourneyTimerStatus('');
+                          }}
+                          className="flex-1 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-mono text-[11px] border border-emerald-200 cursor-pointer"
+                        >
+                          15s (Demo)
+                        </button>
                       </div>
                     ) : (
-                      <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-center space-y-1">
-                        <span className="text-[9px] font-mono text-emerald-800 uppercase block">
-                          {lang === 'hi' ? 'यात्रा टाइमर सक्रिय है' : 'Watch Over Me Timer Running'}
-                        </span>
+                      <div className="p-2 rounded-lg bg-emerald-50 border border-emerald-200 text-center space-y-1">
                         <div className="text-2xl font-mono font-bold text-stone-900">
                           {journeyMinutesLeft < 10 ? `0${journeyMinutesLeft}` : journeyMinutesLeft}:
                           {journeySecondsLeft < 10 ? `0${journeySecondsLeft}` : journeySecondsLeft}
@@ -912,7 +1103,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                         <button
                           onClick={() => {
                             setJourneyTimerActive(false);
-                            setJourneyTimerStatus(lang === 'hi' ? 'सुरक्षित चेक-इन दर्ज: टाइमर बंद।' : 'Safe arrival confirmed. Timer cancelled.');
+                            setJourneyTimerStatus(lang === 'hi' ? 'सुरक्षित चेक-इन: टाइमर बंद।' : 'Safe arrival confirmed. Timer cancelled.');
                           }}
                           className="h-7 px-3 rounded bg-emerald-700 text-white text-[10px] font-medium cursor-pointer"
                         >
@@ -920,15 +1111,14 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                         </button>
                       </div>
                     )}
-
                     {journeyTimerStatus && (
-                      <div className="p-1.5 rounded bg-stone-100 text-[10px] text-stone-800 font-medium">
+                      <div className="p-1 rounded bg-stone-100 text-[10px] text-stone-800 font-medium">
                         {journeyTimerStatus}
                       </div>
                     )}
                   </div>
 
-                  {/* Tool 3: Stealth Shake SOS */}
+                  {/* Stealth Shake SOS */}
                   <div className="p-3 rounded-xl bg-white border border-rose-100 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-medium text-stone-900 flex items-center gap-1.5">
@@ -945,7 +1135,7 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                       <span>{lang === 'hi' ? 'फोन शेक का परीक्षण करें' : 'Simulate Phone Shake / 3-Tap'}</span>
                     </button>
                     {stealthSosMsg && (
-                      <div className="p-1.5 rounded bg-rose-50 border border-rose-200 text-[10px] text-rose-900">
+                      <div className="p-1 rounded bg-rose-50 border border-rose-200 text-[10px] text-rose-900">
                         {stealthSosMsg}
                       </div>
                     )}
@@ -953,105 +1143,155 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
                 </div>
               )}
 
-              {/* TAB 4: NAVIGATION & ESCORT STEPS */}
-              {activeTab === 'navigation' && (
-                <div className="space-y-3">
+              {/* TAB 5: INTERACTIVE SIMULATED LIVE WALK */}
+              {activeTab === 'walk-sim' && (
+                <div className="space-y-3 text-left">
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-[10px] font-mono text-stone-500 uppercase">
-                        Delhi-NCR Safe Corridor
+                        {lang === 'hi' ? 'लाइव वॉक सिमुलेशन' : 'Simulated Live Walk'}
                       </span>
-                      <h3 className="text-sm font-semibold text-stone-900">Cyber City to Sector 29</h3>
+                      <h3 className="text-sm font-semibold text-stone-900">
+                        Cyber City ➔ Sector 29
+                      </h3>
                     </div>
                     <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      96% Lit
+                      96% Lit Corridor
                     </span>
                   </div>
 
-                  {/* Route Comparison Cards */}
-                  <div className="grid grid-cols-2 gap-2 text-left">
-                    <button
-                      onClick={() => setSelectedRoute('safest')}
-                      className={`p-2.5 rounded-xl border text-left transition-colors cursor-pointer ${
-                        selectedRoute === 'safest'
-                          ? 'bg-white border-rose-600 ring-1 ring-rose-200'
-                          : 'bg-rose-50/30 border-rose-100 hover:border-rose-200'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-semibold text-rose-700">Safest</span>
-                        {selectedRoute === 'safest' && (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-rose-600" />
-                        )}
-                      </div>
-                      <p className="text-base font-semibold text-stone-900 font-mono">14 min</p>
-                      <p className="text-[10px] text-stone-500 mt-0.5">4.2 km · 96% Lit</p>
-                      <div className="mt-1 text-[9px] text-emerald-700 font-medium">
-                        4 havens on route
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => setSelectedRoute('fastest')}
-                      className={`p-2.5 rounded-xl border text-left transition-colors cursor-pointer ${
-                        selectedRoute === 'fastest'
-                          ? 'bg-white border-stone-800 ring-1 ring-stone-200'
-                          : 'bg-rose-50/30 border-rose-100 hover:border-rose-200 opacity-80'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium text-stone-600">Standard</span>
-                        {selectedRoute === 'fastest' && (
-                          <AlertTriangle className="w-3.5 h-3.5 text-stone-700" />
-                        )}
-                      </div>
-                      <p className="text-base font-semibold text-stone-900 font-mono">11 min</p>
-                      <p className="text-[10px] text-stone-500 mt-0.5">3.8 km · 42% Lit</p>
-                      <div className="mt-1 text-[9px] text-stone-500">
-                        2 unlit segments
-                      </div>
-                    </button>
+                  {/* Interactive Simulation Triggers Toolbar */}
+                  <div className="p-2.5 rounded-xl bg-stone-900 text-white space-y-1.5">
+                    <span className="text-[9px] font-mono uppercase text-rose-400 block font-medium">
+                      {lang === 'hi' ? 'सिमुलेशन ट्रिगर्स टेस्ट करें:' : 'Inject Simulator Anomaly:'}
+                    </span>
+                    <div className="grid grid-cols-2 gap-1.5 text-[10px]">
+                      <button
+                        onClick={() => {
+                          setSimUnexpectedStop(true);
+                          setSimDeviationAlert(false);
+                        }}
+                        className="py-1 px-1.5 rounded bg-amber-500/80 hover:bg-amber-600 text-white font-medium text-left cursor-pointer truncate"
+                      >
+                        ⚠️ {lang === 'hi' ? 'अनपेक्षित ठहराव (3m)' : '3m Stationary Stop'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSimDeviationAlert(true);
+                          setSimUnexpectedStop(false);
+                        }}
+                        className="py-1 px-1.5 rounded bg-red-600 hover:bg-red-700 text-white font-medium text-left cursor-pointer truncate"
+                      >
+                        🚨 {lang === 'hi' ? 'गलत मोड़ (भटकाव)' : 'Off-Route (>50m)'}
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Live Escort Navigation Feed */}
-                  <div className="p-3 rounded-xl bg-white border border-rose-100 space-y-2">
+                  {/* Unexpected Stop Prompt Modal inside Screen */}
+                  {simUnexpectedStop && (
+                    <div className="p-3 rounded-xl bg-amber-50 border-2 border-amber-400 text-stone-900 space-y-2 animate-bounce">
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                        <AlertTriangle className="w-4 h-4 text-amber-600" />
+                        <span>{lang === 'hi' ? 'क्या आप ठीक हैं? (ठहराव दर्ज)' : 'Are you okay? Prolonged Stop'}</span>
+                      </div>
+                      <p className="text-[10px] text-stone-700 leading-snug">
+                        {lang === 'hi'
+                          ? 'आप पिछले 3 मिनट से एक अंधेरे मोड़ के पास रुके हुए हैं। क्या आपको मदद चाहिए?'
+                          : 'You have been stationary for 3 minutes near an unlit alley. Confirm status:'}
+                      </p>
+                      <div className="flex gap-2 text-xs">
+                        <button
+                          onClick={() => setSimUnexpectedStop(false)}
+                          className="flex-1 py-1 rounded bg-stone-900 text-white font-medium cursor-pointer"
+                        >
+                          {lang === 'hi' ? 'मैं ठीक हूँ (रद्द)' : "I'm Safe"}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSimUnexpectedStop(false);
+                            setActiveTab('safety-hold');
+                            setCountdown(0); // Trigger SOS
+                          }}
+                          className="flex-1 py-1 rounded bg-red-600 text-white font-medium cursor-pointer"
+                        >
+                          {lang === 'hi' ? 'मदद चाहिए (SOS)' : 'Trigger SOS'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Route Deviation Banner inside Screen */}
+                  {simDeviationAlert && (
+                    <div className="p-3 rounded-xl bg-red-600 text-white space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <strong className="text-xs flex items-center gap-1">
+                          <AlertOctagon className="w-3.5 h-3.5" />
+                          <span>{lang === 'hi' ? 'सुरक्षित मार्ग से भटकाव!' : 'Off-Route Deviation Alert'}</span>
+                        </strong>
+                        <span className="text-[9px] font-mono bg-white/20 px-1 rounded">70m Away</span>
+                      </div>
+                      <p className="text-[10px] text-red-100 leading-snug">
+                        {lang === 'hi'
+                          ? 'आप रोशनी वाले मुख्य मार्ग से हटकर अंधेरी गली की तरफ चले गए हैं। नजदीकी सुरक्षित शरण: अपोलो फार्मेसी (250m)'
+                          : 'You deviated into an unlit back stretch. Nearest certified refuge: Apollo Pharmacy 24/7 (250m).'}
+                      </p>
+                      <button
+                        onClick={() => {
+                          setSimDeviationAlert(false);
+                          setWalkStepIndex(1); // reroute to Apollo
+                        }}
+                        className="w-full py-1 rounded bg-white text-red-700 font-semibold text-[10px] cursor-pointer"
+                      >
+                        {lang === 'hi' ? 'अपोलो फार्मेसी पर री-रूट करें' : 'Reroute to Apollo Pharmacy'}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Visual Step Timeline */}
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-semibold text-stone-900 flex items-center gap-1.5">
                         <Navigation className="w-3.5 h-3.5 text-rose-600" />
-                        <span>Live Escort Step</span>
+                        <span>{lang === 'hi' ? 'वर्तमान कदम' : 'Current Waypoint'}</span>
                       </span>
                       <span className="text-[10px] font-mono text-stone-400">
-                        Step {navStepIndex + 1}/{navigationSteps.length}
+                        {walkStepIndex + 1}/{walkCorridorSteps.length}
                       </span>
                     </div>
 
-                    <div className="p-2.5 rounded-lg bg-rose-50/50 border border-rose-100 text-xs">
-                      <p className="font-medium text-stone-900">
-                        {lang === 'hi' ? navigationSteps[navStepIndex].textHi : navigationSteps[navStepIndex].text}
+                    <div className="p-2.5 rounded-xl bg-white border border-rose-200 shadow-2xs space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-rose-50 text-rose-700 border border-rose-100">
+                          {walkCorridorSteps[walkStepIndex].tag}
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-700 font-semibold">
+                          {walkCorridorSteps[walkStepIndex].lit}
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-semibold text-stone-900">
+                        {lang === 'hi' ? walkCorridorSteps[walkStepIndex].titleHi : walkCorridorSteps[walkStepIndex].title}
+                      </h4>
+                      <p className="text-[10px] text-stone-500">
+                        {lang === 'hi' ? walkCorridorSteps[walkStepIndex].detailsHi : walkCorridorSteps[walkStepIndex].details}
                       </p>
-                      <span className="text-[10px] text-rose-600 font-mono block mt-0.5">
-                        Distance remaining: {navigationSteps[navStepIndex].distance}
-                      </span>
                     </div>
                   </div>
 
-                  {/* Navigation Action */}
+                  {/* Walk Toggle */}
                   <button
-                    onClick={() => setIsNavigating(!isNavigating)}
-                    className={`w-full h-9 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer ${
-                      isNavigating
-                        ? 'bg-stone-900 text-white'
-                        : 'bg-rose-600 hover:bg-rose-700 text-white'
+                    onClick={() => setIsWalking(!isWalking)}
+                    className={`w-full h-8 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer ${
+                      isWalking ? 'bg-stone-900 text-white' : 'bg-rose-600 hover:bg-rose-700 text-white'
                     }`}
                   >
-                    {isNavigating ? <Square className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                    <span>{isNavigating ? (lang === 'hi' ? 'वॉक रोकें' : 'Stop Escort Walk') : (lang === 'hi' ? 'लाइव वॉक शुरू करें' : 'Start Live Escort Walk')}</span>
+                    {isWalking ? <Square className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                    <span>{isWalking ? (lang === 'hi' ? 'सिमुलेशन रोकें' : 'Pause Live Escort Walk') : (lang === 'hi' ? 'लाइव वॉक शुरू करें' : 'Start Live Escort Walk')}</span>
                   </button>
                 </div>
               )}
 
-              {/* TAB 5: SAFE HAVENS */}
-              {activeTab === 'safe-havens' && (
+              {/* TAB 6: SAFE HAVENS */}
+              {activeTab === 'havens' && (
                 <div className="space-y-2">
                   <div>
                     <span className="text-[10px] font-mono text-stone-500 uppercase">
@@ -1095,8 +1335,8 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
 
                         <button
                           onClick={() => {
-                            setActiveTab('navigation');
-                            setIsNavigating(true);
+                            setActiveTab('walk-sim');
+                            setIsWalking(true);
                           }}
                           className="h-7 px-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-medium flex-shrink-0 flex items-center gap-1 transition-colors cursor-pointer"
                         >
@@ -1110,55 +1350,65 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
               )}
             </div>
 
-            {/* BOTTOM PHONE NAVIGATION TABS (5 Tabs) */}
-            <div className="h-14 bg-white border-t border-rose-100 px-2 flex items-center justify-around z-30 select-none">
+            {/* BOTTOM PHONE NAVIGATION TABS (6 TABS) */}
+            <div className="h-14 bg-white border-t border-rose-100 px-1 flex items-center justify-around z-30 select-none">
               <button
                 onClick={() => setActiveTab('safety-hold')}
-                className={`flex flex-col items-center gap-0.5 text-[9px] transition-colors cursor-pointer ${
+                className={`flex flex-col items-center gap-0.5 text-[8.5px] transition-colors cursor-pointer ${
                   activeTab === 'safety-hold' ? 'text-rose-600 font-semibold' : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
-                <ShieldAlert className="w-4 h-4" />
+                <ShieldAlert className="w-3.5 h-3.5" />
                 <span>{lang === 'hi' ? 'होल्ड' : 'Hold'}</span>
               </button>
 
               <button
+                onClick={() => setActiveTab('guardian')}
+                className={`flex flex-col items-center gap-0.5 text-[8.5px] transition-colors cursor-pointer ${
+                  activeTab === 'guardian' ? 'text-rose-600 font-semibold' : 'text-stone-400 hover:text-stone-600'
+                }`}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>{lang === 'hi' ? 'सर्कल' : 'Circle'}</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('fake-call')}
-                className={`flex flex-col items-center gap-0.5 text-[9px] transition-colors cursor-pointer ${
+                className={`flex flex-col items-center gap-0.5 text-[8.5px] transition-colors cursor-pointer ${
                   activeTab === 'fake-call' ? 'text-rose-600 font-semibold' : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
-                <PhoneCall className="w-4 h-4" />
+                <PhoneCall className="w-3.5 h-3.5" />
                 <span>{lang === 'hi' ? 'कॉल' : 'Call'}</span>
               </button>
 
               <button
-                onClick={() => setActiveTab('panic-tools')}
-                className={`flex flex-col items-center gap-0.5 text-[9px] transition-colors cursor-pointer ${
-                  activeTab === 'panic-tools' ? 'text-rose-600 font-semibold' : 'text-stone-400 hover:text-stone-600'
+                onClick={() => setActiveTab('panic')}
+                className={`flex flex-col items-center gap-0.5 text-[8.5px] transition-colors cursor-pointer ${
+                  activeTab === 'panic' ? 'text-rose-600 font-semibold' : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
-                <Zap className="w-4 h-4" />
+                <Zap className="w-3.5 h-3.5" />
                 <span>{lang === 'hi' ? 'सायरन' : 'Panic'}</span>
               </button>
 
               <button
-                onClick={() => setActiveTab('navigation')}
-                className={`flex flex-col items-center gap-0.5 text-[9px] transition-colors cursor-pointer ${
-                  activeTab === 'navigation' ? 'text-rose-600 font-semibold' : 'text-stone-400 hover:text-stone-600'
+                onClick={() => setActiveTab('walk-sim')}
+                className={`flex flex-col items-center gap-0.5 text-[8.5px] transition-colors cursor-pointer ${
+                  activeTab === 'walk-sim' ? 'text-rose-600 font-semibold' : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
-                <Navigation className="w-4 h-4" />
-                <span>{lang === 'hi' ? 'मार्ग' : 'Route'}</span>
+                <Navigation className="w-3.5 h-3.5" />
+                <span>{lang === 'hi' ? 'वॉक' : 'Walk'}</span>
               </button>
 
               <button
-                onClick={() => setActiveTab('safe-havens')}
-                className={`flex flex-col items-center gap-0.5 text-[9px] transition-colors cursor-pointer ${
-                  activeTab === 'safe-havens' ? 'text-rose-600 font-semibold' : 'text-stone-400 hover:text-stone-600'
+                onClick={() => setActiveTab('havens')}
+                className={`flex flex-col items-center gap-0.5 text-[8.5px] transition-colors cursor-pointer ${
+                  activeTab === 'havens' ? 'text-rose-600 font-semibold' : 'text-stone-400 hover:text-stone-600'
                 }`}
               >
-                <Building className="w-4 h-4" />
+                <Building className="w-3.5 h-3.5" />
                 <span>{lang === 'hi' ? 'ठिकाने' : 'Havens'}</span>
               </button>
             </div>
@@ -1171,10 +1421,10 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
         </div>
 
         {/* ============================================================== */}
-        {/* COMPANION INSTRUCTIONS & CONTROLS */}
+        {/* COMPANION INSTRUCTIONS & 1-CLICK QUICK SCENARIOS */}
         {/* ============================================================== */}
         <div className="max-w-md w-full text-left space-y-4 p-5 sm:p-6 rounded-2xl bg-white border border-rose-200/80 shadow-md">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between">
             <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-rose-50 text-rose-700 border border-rose-200 font-medium">
               Simulation Sandbox
             </span>
@@ -1182,59 +1432,96 @@ export default function PhoneMockupDemo({ isOpen, onClose }: PhoneMockupDemoProp
           </div>
 
           <h2 className="text-xl font-semibold tracking-tight text-stone-900">
-            {lang === 'hi' ? 'इंटरैक्टिव मोबाइल सुरक्षा सिम्युलेटर' : 'Interactive mobile application simulator'}
+            {lang === 'hi' ? 'इंटरैक्टिव डेमो सिनेरियो' : 'Interactive Demo Scenarios'}
           </h2>
 
           <p className="text-xs text-stone-600 leading-relaxed font-normal">
             {lang === 'hi'
-              ? 'यह सिम्युलेटर असली एंड्रॉइड ऐप के सभी सुरक्षा फीचर्स को आपके ब्राउज़र में चलाकर दिखाता है:'
-              : 'This simulator reproduces the core Kotlin Android application logic in your browser. Test these real-world flows:'}
+              ? 'जजों या उपयोगकर्ताओं को दिखाने के लिए नीचे दिए गए 1-क्लिक बटनों से किसी भी सुरक्षा स्थिति का तुरंत अनुभव लें:'
+              : 'Click any scenario below to trigger live simulation flows directly inside the virtual smartphone:'}
           </p>
 
-          <div className="space-y-2.5 text-xs">
-            <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100 space-y-1">
-              <strong className="text-stone-900 block font-medium">
-                {lang === 'hi' ? "1. डेड मैन्स स्विच (सुरक्षा होल्ड):" : "1. Hold & Release Dead Man's Switch:"}
-              </strong>
-              <p className="text-stone-600">
-                {lang === 'hi'
-                  ? 'गुलाबी बटन पर माउस/टच दबाए रखें, और छोड़ते ही 10 सेकंड का आपातकालीन टाइमर देखें।'
-                  : 'Hold the rose button with your mouse/touch, then release it to watch the 10-second emergency countdown trigger.'}
-              </p>
-            </div>
+          {/* 5 Scenario Buttons */}
+          <div className="space-y-2 text-xs">
+            {/* Scenario 1: Dead Man's Switch */}
+            <button
+              onClick={() => launchScenario('duress')}
+              className="w-full p-2.5 rounded-xl border border-rose-200 hover:border-rose-500 bg-rose-50/40 hover:bg-rose-50 text-left transition-colors cursor-pointer flex items-center justify-between group"
+            >
+              <div>
+                <strong className="text-stone-900 group-hover:text-rose-700 block font-medium">
+                  {lang === 'hi' ? '1. डेड मैन्स स्विच और गुप्त पिन (9876)' : "1. Dead Man's Switch & Duress (9876)"}
+                </strong>
+                <p className="text-[11px] text-stone-500">
+                  {lang === 'hi' ? 'हमलावर के सामने नकली अलार्म कैंसल' : 'Deceptive cancel display + silent police SOS'}
+                </p>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-rose-600 flex-shrink-0" />
+            </button>
 
-            <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100 space-y-1">
-              <strong className="text-stone-900 block font-medium">
-                {lang === 'hi' ? '2. हमलावर के सामने गुप्त पिन (9876):' : '2. Test Duress PIN (9876):'}
-              </strong>
-              <p className="text-stone-600">
-                {lang === 'hi'
-                  ? '9876 डालकर देखें कि कैसे स्क्रीन पर "अलार्म बंद" दिखता है जबकि चुपके से पुलिस को लोकेशन चली जाती है।'
-                  : 'Type 9876 to see how Safie deceives an aggressor by displaying "Alarm Cancelled" while covertly transmitting a red alert to 112.'}
-              </p>
-            </div>
+            {/* Scenario 2: Fake Brother Call */}
+            <button
+              onClick={() => launchScenario('fake-call')}
+              className="w-full p-2.5 rounded-xl border border-blue-200 hover:border-blue-500 bg-blue-50/40 hover:bg-blue-50 text-left transition-colors cursor-pointer flex items-center justify-between group"
+            >
+              <div>
+                <strong className="text-stone-900 group-hover:text-blue-700 block font-medium">
+                  {lang === 'hi' ? '2. भैया की असली आवाज़ वाली फर्जी कॉल' : '2. Escape Stalker via Bhaiya Fake Call'}
+                </strong>
+                <p className="text-[11px] text-stone-500">
+                  {lang === 'hi' ? 'स्पीकर पर आवाज़: "मैं बाहर कार में खड़ा हूँ..."' : 'Real speech: "Waiting outside with car running..."'}
+                </p>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+            </button>
 
-            <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100 space-y-1">
-              <strong className="text-stone-900 block font-medium">
-                {lang === 'hi' ? '3. आवाज़ वाली फर्जी कॉल:' : '3. Audio Fake Call Deterrent:'}
-              </strong>
-              <p className="text-stone-600">
-                {lang === 'hi'
-                  ? 'कॉल टैब में भैया, मम्मी या कैब ड्राइवर चुनें और असली आवाज़ सुनें।'
-                  : 'Under Call tab, pick Bhaiya, Mom, or Cab driver and accept to hear real speech audio.'}
-              </p>
-            </div>
+            {/* Scenario 3: Unexpected Stop */}
+            <button
+              onClick={() => launchScenario('unexpected-stop')}
+              className="w-full p-2.5 rounded-xl border border-amber-200 hover:border-amber-500 bg-amber-50/40 hover:bg-amber-50 text-left transition-colors cursor-pointer flex items-center justify-between group"
+            >
+              <div>
+                <strong className="text-stone-900 group-hover:text-amber-800 block font-medium">
+                  {lang === 'hi' ? '3. अंधेरे में 3 मिनट रुकने का अलर्ट' : '3. Unexpected Stop near Dark Spot'}
+                </strong>
+                <p className="text-[11px] text-stone-500">
+                  {lang === 'hi' ? 'अनपेक्षित ठहराव पर "क्या आप ठीक हैं?" चेक' : 'Automatic "Are you OK?" prompt after 3m'}
+                </p>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+            </button>
 
-            <div className="p-3 rounded-xl bg-rose-50/40 border border-rose-100 space-y-1">
-              <strong className="text-stone-900 block font-medium">
-                {lang === 'hi' ? '4. सायरन व यात्रा टाइमर:' : '4. Panic Siren & Journey Timer:'}
-              </strong>
-              <p className="text-stone-600">
-                {lang === 'hi'
-                  ? 'Panic टैब में तेज़ सायरन बजाएं और "Watch Over Me" यात्रा चेक-इन टाइमर चलाएं।'
-                  : 'Under Panic tab, trigger the high-decibel Web Audio siren or set a timed arrival check-in.'}
-              </p>
-            </div>
+            {/* Scenario 4: Acoustic Siren */}
+            <button
+              onClick={() => launchScenario('siren')}
+              className="w-full p-2.5 rounded-xl border border-purple-200 hover:border-purple-500 bg-purple-50/40 hover:bg-purple-50 text-left transition-colors cursor-pointer flex items-center justify-between group"
+            >
+              <div>
+                <strong className="text-stone-900 group-hover:text-purple-800 block font-medium">
+                  {lang === 'hi' ? '4. तेज़ सायरन और चमकती लाल स्क्रीन' : '4. Acoustic Siren & Flashing Strobe'}
+                </strong>
+                <p className="text-[11px] text-stone-500">
+                  {lang === 'hi' ? 'हमलावर को भगाने और भीड़ जुटाने के लिए' : 'Web Audio police siren + 10Hz screen strobe'}
+                </p>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-purple-600 flex-shrink-0" />
+            </button>
+
+            {/* Scenario 5: Guardian Circle */}
+            <button
+              onClick={() => launchScenario('guardian')}
+              className="w-full p-2.5 rounded-xl border border-emerald-200 hover:border-emerald-500 bg-emerald-50/40 hover:bg-emerald-50 text-left transition-colors cursor-pointer flex items-center justify-between group"
+            >
+              <div>
+                <strong className="text-stone-900 group-hover:text-emerald-800 block font-medium">
+                  {lang === 'hi' ? '5. गार्जियन सर्कल: "असहज लग रहा है"' : '5. Guardian Circle: "Feeling Uneasy"'}
+                </strong>
+                <p className="text-[11px] text-stone-500">
+                  {lang === 'hi' ? 'पापा व बहन को तुरंत 5s जीपीएस पिंग' : 'Broadcast alert to Dad & Sister; 5s fast ping'}
+                </p>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+            </button>
           </div>
 
           {/* Quick Action to Download Android APK */}
