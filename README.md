@@ -218,6 +218,12 @@ A complete, 8-slide presentation blueprint matching the official template of **T
 
 ---
 
+## Technical Architecture & Specification
+
+A comprehensive technical specification containing all Mermaid sequence diagrams, state machines, entity-relationship models, and routing logic formulas is documented in [architecture.md](architecture.md).
+
+---
+
 ## Disclaimer & Ethical Considerations
 
 Safie evaluates observable environmental factors, municipal lighting data, open commercial frontages, and historical street infrastructure. **Environmental indicators are not proof of absolute personal safety.** Safie does not claim to eliminate risk or guarantee harm-free transit; rather, it equips commuters with actionable situational awareness to make well-informed transit decisions. Emergency SOS services are designed to augment, not replace, local civic emergency dispatch services (such as ERSS 112 in India).
